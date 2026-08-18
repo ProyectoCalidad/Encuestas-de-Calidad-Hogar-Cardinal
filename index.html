@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardinal Assistance · Panel de Satisfacción Hogar</title>
+<style>
+:root{
+  --navy-1:#0a2b4a;
+  --navy-2:#0e3866;
+  --navy-3:#123f70;
+  --card-bd: rgba(255,255,255,0.10);
+  --teal:#12a79c;
+  --orange:#ee9324;
+  --pink:#e61c5c;
+  --text:#f3f7fb;
+  --text-dim:#b9c9dc;
+  --good:#12a79c;
+  --bad:#e61c5c;
+  --neutral:#ee9324;
+  --radius:14px;
+}
+[data-theme="light"]{
+  --navy-1:#eef3f8;
+  --navy-2:#ffffff;
+  --navy-3:#f5f8fb;
+  --card-bd: rgba(10,43,74,0.10);
+  --text:#0a2b4a;
+  --text-dim:#4c6178;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  background:linear-gradient(180deg,var(--navy-1),var(--navy-2) 60%, var(--navy-1));
+  color:var(--text);
+  min-height:100vh;
+  transition:background .3s,color .3s;
+}
+.wrap{max-width:1320px;margin:0 auto;padding:20px 22px 60px;}
+
+header.top{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  gap:16px;padding:18px 0 10px;
+}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand img{height:44px;}
+.brand h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.2px;}
+.brand p{margin:2px 0 0;font-size:12.5px;color:var(--text-dim);}
+.top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.pill{
+  background:var(--card-bd);
+  border:1px solid var(--card-bd);
+  padding:7px 14px;border-radius:999px;font-size:12.5px;color:var(--text-dim);
+}
+.theme-btn{
+  cursor:pointer;border:1px solid var(--card-bd);background:transparent;color:var(--text);
+  width:38px;height:38px;border-radius:999px;font-size:16px;display:flex;align-items:center;justify-content:center;
+}
+
+.filters{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  background:rgba(255,255,255,0.04);border:1px solid var(--card-bd);
+  padding:12px 16px;border-radius:var(--radius);margin:6px 0 22px;
+}
+[data-theme="light"] .filters{background:rgba(10,43,74,0.03);}
+.filters select{
+  background:var(--navy-3);color:var(--text);border:1px solid var(--card-bd);
+  padding:8px 10px;border-radius:8px;font-size:13px;min-width:150px;
+}
+.filters .clear{
+  cursor:pointer;background:transparent;border:1px solid var(--card-bd);color:var(--text-dim);
+  padding:8px 14px;border-radius:8px;font-size:12.5px;
+}
+.stats-line{
+  display:flex;gap:28px;align-items:baseline;margin:0 0 22px 4px;flex-wrap:wrap;
+}
+.stats-line .stat{display:flex;align-items:baseline;gap:8px;}
+.stats-line .stat-val{font-size:22px;font-weight:800;color:var(--text);}
+.stats-line .stat-lbl{font-size:12.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+@media (max-width:920px){.kpi-grid{grid-template-columns:1fr;}}
+
+.card{
+  background:var(--navy-3);
+  border:1px solid var(--card-bd);
+  border-radius:var(--radius);
+  padding:18px 20px;
+}
+.kpi-card .kpi-label{font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);font-weight:600;}
+.kpi-card .kpi-value{font-size:38px;font-weight:800;margin:6px 0 2px;}
+.kpi-card .kpi-sub{font-size:11.5px;color:var(--text-dim);margin-bottom:10px;}
+.kpi-bar{height:3px;border-radius:3px;margin-bottom:14px;}
+.dist-row{display:flex;align-items:center;gap:8px;font-size:11.5px;margin:5px 0;color:var(--text-dim);}
+.dist-row .lbl{width:70px;flex:0 0 70px;}
+.dist-row .track{flex:1;height:8px;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden;}
+[data-theme="light"] .dist-row .track{background:rgba(10,43,74,0.08);}
+.dist-row .fill{height:100%;border-radius:6px;}
+.dist-row .pct{width:38px;flex:0 0 38px;text-align:right;color:var(--text);font-weight:600;}
+
+.nps-legend{display:flex;gap:14px;margin-top:8px;font-size:11.5px;flex-wrap:wrap;}
+.nps-legend span{display:flex;align-items:center;gap:5px;color:var(--text-dim);}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+
+.charts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+@media (max-width:920px){.charts-grid{grid-template-columns:1fr;}}
+.chart-card h3{font-size:14.5px;margin:0 0 4px;font-weight:700;}
+.chart-card .chart-sub{font-size:11.5px;color:var(--text-dim);margin-bottom:10px;}
+.chart-card{min-height:270px;}
+.chart-wide{grid-column:1 / -1;}
+
+svg text{fill:var(--text);font-family:inherit;}
+.axis text{fill:var(--text-dim);font-size:10px;}
+.axis line, .axis path{stroke:var(--card-bd);}
+.gridline{stroke:var(--card-bd);stroke-dasharray:2,3;}
+
+.legend-row{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text-dim);margin-top:6px;}
+.legend-row span{display:flex;align-items:center;gap:5px;}
+
+.comments-section{margin-top:22px;}
+.comments-section h2{font-size:17px;margin:0 0 4px;}
+.comments-section .sub{font-size:12.5px;color:var(--text-dim);margin-bottom:14px;}
+.comment-card{
+  background:var(--navy-3);border:1px solid var(--card-bd);border-left:3px solid var(--pink);
+  border-radius:10px;padding:12px 16px;margin-bottom:10px;
+}
+.comment-card .meta{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--text-dim);margin-bottom:6px;flex-wrap:wrap;}
+.comment-card .meta b{color:var(--text);}
+.comment-card p{margin:0;font-size:13.5px;line-height:1.5;}
+.no-comments{color:var(--text-dim);font-size:13px;font-style:italic;}
+
+footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);}
+</style>
+</head>
+<body data-theme="dark">
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <img src="img/logo.png" alt="Cardinal Assistance">
+      <div>
+        <h1>Panel de Satisfacción · Hogar</h1>
+        <p>Experiencia de asistencia domiciliaria — resultados de encuesta</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="pill" id="generadoPill">Datos actualizados —</span>
+      <button class="theme-btn" id="themeBtn" title="Cambiar tema">🌙</button>
+    </div>
+  </header>
+
+  <div class="filters">
+    <select id="fMes"><option value="">Mes: todos</option></select>
+    <select id="fArea"><option value="">Área: todas</option></select>
+    <select id="fCia"><option value="">Cía: todas</option></select>
+    <button class="clear" id="clearFiltros">Limpiar filtros</button>
+  </div>
+
+  <div class="stats-line">
+    <div class="stat"><span class="stat-val" id="countCasos">0</span><span class="stat-lbl">Casos totales</span></div>
+    <div class="stat"><span class="stat-val" id="countEncuestas">0</span><span class="stat-lbl">Encuestas realizadas</span></div>
+  </div>
+
+  <section class="kpi-grid">
+    <div class="card kpi-card" id="kpiAtencion">
+      <div class="kpi-label">Satisfacción con la Atención</div>
+      <div class="kpi-value" id="atVal">–</div>
+      <div class="kpi-sub" id="atSub">Escala 1 a 5 · encuestas realizadas o parciales</div>
+      <div class="kpi-bar" style="background:var(--teal)"></div>
+      <div id="atDist"></div>
+    </div>
+
+    <div class="card kpi-card" id="kpiTrabajo">
+      <div class="kpi-label">Satisfacción con el Trabajo Realizado</div>
+      <div class="kpi-value" id="trVal">–</div>
+      <div class="kpi-sub" id="trSub">Escala 1 a 5 · encuestas realizadas o parciales</div>
+      <div class="kpi-bar" style="background:var(--orange)"></div>
+      <div id="trDist"></div>
+    </div>
+
+    <div class="card kpi-card" id="kpiNps">
+      <div class="kpi-label">NPS (% Promotor − % Detractor)</div>
+      <div class="kpi-value" id="npsVal">–</div>
+      <div class="kpi-sub" id="npsSub">—</div>
+      <div class="kpi-bar" style="background:var(--pink)"></div>
+      <div class="nps-legend">
+        <span><i class="dot" style="background:var(--teal)"></i>Promotor <b id="npsProm">–</b></span>
+        <span><i class="dot" style="background:var(--orange)"></i>Pasivo <b id="npsPas">–</b></span>
+        <span><i class="dot" style="background:var(--pink)"></i>Detractor <b id="npsDet">–</b></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="charts-grid">
+    <div class="card chart-card">
+      <h3>Evolución mensual · Calidad de Atención</h3>
+      <div class="chart-sub">% respuestas Excelente/Muy bueno vs Regular/Malo</div>
+      <div id="chAtencionEvol"></div>
+    </div>
+    <div class="card chart-card">
+      <h3>Evolución mensual · Calidad del Trabajo Realizado</h3>
+      <div class="chart-sub">% respuestas Excelente/Muy bueno vs Regular/Malo</div>
+      <div id="chTrabajoEvol"></div>
+    </div>
+    <div class="card chart-card">
+      <h3>Evolución mensual · NPS</h3>
+      <div class="chart-sub">% Promotor vs % Detractor por mes</div>
+      <div id="chNpsEvol"></div>
+    </div>
+    <div class="card chart-card">
+      <h3>NPS — Composición</h3>
+      <div class="chart-sub">Promotor / Pasivo / Detractor</div>
+      <div id="chNpsDonut"></div>
+    </div>
+    <div class="card chart-card">
+      <h3>Nivel de Contacto</h3>
+      <div class="chart-sub">Gestión telefónica del caso</div>
+      <div id="chContacto"></div>
+    </div>
+    <div class="card chart-card">
+      <h3>Nivel de Respuesta</h3>
+      <div class="chart-sub">Estado de la encuesta</div>
+      <div id="chRespuesta"></div>
+    </div>
+    <div class="card chart-card chart-wide">
+      <h3>Distribución de Respuestas</h3>
+      <div class="chart-sub">Atención vs Trabajo Realizado — % por categoría</div>
+      <div id="chDistribucion"></div>
+    </div>
+  </section>
+
+  <section class="comments-section">
+    <h2>Comentarios de Clientes Detractores</h2>
+    <div class="sub">Encuestas con recomendación negativa — se muestra el prestador asociado</div>
+    <div id="comentariosBox"></div>
+  </section>
+
+  <footer>Panel generado a partir de la base de datos mensual de encuestas de satisfacción · Cardinal Assistance</footer>
+</div>
+
+<script>
+const COLORS = { teal:'#12a79c', orange:'#ee9324', pink:'#e61c5c', dim:'#6f88a3' };
+const SCALE_LABELS = {5:'Excelente',4:'Muy bueno',3:'Bueno',2:'Regular',1:'Malo'};
+const SCALE_COLORS = {5:'#12a79c',4:'#3fb7c9',3:'#ee9324',2:'#e8823b',1:'#e61c5c'};
+
+let RAW = [];
+
+function svgEl(tag, attrs){
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for(const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+
+function fmtPct(n){ return (Math.round(n*10)/10).toString().replace('.',',') + '%'; }
+function fmtNum(n){ return (Math.round(n*100)/100).toString().replace('.',','); }
+
+// ---------- Filtros ----------
+function poblarFiltros(data){
+  const meses = [...new Set(data.map(r=>r.mes).filter(Boolean))].sort((a,b)=>{
+    const oa = data.find(r=>r.mes===a).mes_orden, ob = data.find(r=>r.mes===b).mes_orden;
+    return oa - ob;
+  });
+  const areas = [...new Set(data.map(r=>r.area))].sort();
+  const cias = [...new Set(data.map(r=>r.cia))].sort();
+
+  fillSelect('fMes', meses, 'Mes: todos');
+  fillSelect('fArea', areas, 'Área: todas');
+  fillSelect('fCia', cias, 'Cía: todas');
+}
+function fillSelect(id, values, placeholder){
+  const sel = document.getElementById(id);
+  sel.innerHTML = `<option value="">${placeholder}</option>`;
+  values.forEach(v=>{
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    sel.appendChild(o);
+  });
+}
+function filtrar(){
+  const m = document.getElementById('fMes').value;
+  const a = document.getElementById('fArea').value;
+  const c = document.getElementById('fCia').value;
+  return RAW.filter(r=>
+    (!m || r.mes===m) &&
+    (!a || r.area===a) &&
+    (!c || r.cia===c)
+  );
+}
+
+// ---------- Calculo de metricas ----------
+function esValida(r){
+  return r.estado_encuesta === 'Encuesta Realizada' || r.estado_encuesta === 'Parcial';
+}
+function calcular(data){
+  const validos = data.filter(esValida);
+
+  function promYDist(campo){
+    const vals = validos.map(r=>r[campo]).filter(v=>v!==null && v!==undefined);
+    const prom = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+    const dist = {1:0,2:0,3:0,4:0,5:0};
+    vals.forEach(v=>{ const k = Math.round(v); if(dist[k]!==undefined) dist[k]++; });
+    const total = vals.length || 1;
+    const pct = {}; for(let k=1;k<=5;k++) pct[k] = dist[k]*100/total;
+    return {prom, pct, n: vals.length};
+  }
+
+  const atencion = promYDist('atencion');
+  const trabajo = promYDist('trabajo');
+
+  const npsBase = validos.filter(r=>r.recomendacion);
+  const nProm = npsBase.filter(r=>r.recomendacion==='promotor').length;
+  const nPas = npsBase.filter(r=>r.recomendacion==='pasivo').length;
+  const nDet = npsBase.filter(r=>r.recomendacion==='detractor').length;
+  const nTot = npsBase.length || 1;
+  const pctProm = nProm*100/nTot, pctPas = nPas*100/nTot, pctDet = nDet*100/nTot;
+  const nps = pctProm - pctDet;
+
+  // Comentarios detractores
+  const comentarios = validos
+    .filter(r=>r.recomendacion==='detractor' && r.comentario)
+    .map(r=>({prestador:r.prestador, comentario:r.comentario, mes:r.mes}));
+
+  // Evolucion mensual
+  const mesesUnicos = [...new Set(validos.map(r=>r.mes))].sort((a,b)=>{
+    const oa = validos.find(r=>r.mes===a).mes_orden, ob = validos.find(r=>r.mes===b).mes_orden;
+    return oa - ob;
+  });
+  const evolucion = mesesUnicos.map(m=>{
+    const reg = validos.filter(r=>r.mes===m);
+    const at = reg.map(r=>r.atencion).filter(v=>v!==null&&v!==undefined);
+    const tr = reg.map(r=>r.trabajo).filter(v=>v!==null&&v!==undefined);
+    const npsReg = reg.filter(r=>r.recomendacion);
+    const pP = npsReg.length ? npsReg.filter(r=>r.recomendacion==='promotor').length*100/npsReg.length : 0;
+    const pD = npsReg.length ? npsReg.filter(r=>r.recomendacion==='detractor').length*100/npsReg.length : 0;
+    return {
+      mes:m,
+      posAt: at.length ? at.filter(v=>v>=4).length*100/at.length : 0,
+      negAt: at.length ? at.filter(v=>v<=2).length*100/at.length : 0,
+      posTr: tr.length ? tr.filter(v=>v>=4).length*100/tr.length : 0,
+      negTr: tr.length ? tr.filter(v=>v<=2).length*100/tr.length : 0,
+      pProm: pP, pDet: pD, nps: pP - pD,
+    };
+  });
+
+  // Nivel de contacto / respuesta (sobre TODOS los casos filtrados, no solo validos)
+  const nivelContacto = countBy(data, 'gestion_tel');
+  const nivelRespuesta = countBy(data, 'estado_encuesta');
+  const encuestasRealizadas = nivelRespuesta['Encuesta Realizada'] || 0;
+
+  return { atencion, trabajo, nps, pctProm, pctPas, pctDet, comentarios, evolucion, nivelContacto, nivelRespuesta, totalCasos: data.length, totalEncuestas: validos.length, encuestasRealizadas };
+}
+function countBy(arr, campo){
+  const m = {};
+  arr.forEach(r=>{ const k = r[campo]||'Sin dato'; m[k]=(m[k]||0)+1; });
+  return m;
+}
+
+// ---------- Render KPIs ----------
+function renderDist(containerId, dist){
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  for(let k=5;k>=1;k--){
+    const row = document.createElement('div');
+    row.className = 'dist-row';
+    row.innerHTML = `
+      <div class="lbl">${SCALE_LABELS[k]}</div>
+      <div class="track"><div class="fill" style="width:${dist[k]}%;background:${SCALE_COLORS[k]}"></div></div>
+      <div class="pct">${fmtPct(dist[k])}</div>`;
+    el.appendChild(row);
+  }
+}
+
+function renderKPIs(m){
+  document.getElementById('atVal').textContent = m.atencion.n ? fmtNum(m.atencion.prom) : '–';
+  document.getElementById('atSub').textContent = `Escala 1 a 5 · ${m.atencion.n} respuestas`;
+  renderDist('atDist', m.atencion.pct);
+
+  document.getElementById('trVal').textContent = m.trabajo.n ? fmtNum(m.trabajo.prom) : '–';
+  document.getElementById('trSub').textContent = `Escala 1 a 5 · ${m.trabajo.n} respuestas`;
+  renderDist('trDist', m.trabajo.pct);
+
+  document.getElementById('npsVal').textContent = m.totalEncuestas ? fmtPct(m.nps) : '–';
+  document.getElementById('npsSub').textContent = `${m.totalEncuestas} encuestas consideradas`;
+  document.getElementById('npsProm').textContent = fmtPct(m.pctProm);
+  document.getElementById('npsPas').textContent = fmtPct(m.pctPas);
+  document.getElementById('npsDet').textContent = fmtPct(m.pctDet);
+
+  document.getElementById('countCasos').textContent = m.totalCasos;
+  document.getElementById('countEncuestas').textContent = m.encuestasRealizadas;
+}
+
+// ---------- Charts (SVG nativo) ----------
+function clearAndSize(containerId, h){
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const w = el.clientWidth || 480;
+  const svg = svgEl('svg', {viewBox:`0 0 ${w} ${h}`, width:'100%', height:h, preserveAspectRatio:'xMidYMid meet'});
+  el.appendChild(svg);
+  return {svg, w, h};
+}
+
+function barsDual(containerId, categorias, seriesA, seriesB, colorA, colorB, labelA, labelB, fmt){
+  const h = 210;
+  const {svg, w} = clearAndSize(containerId, h);
+  const padL = 34, padR = 10, padT = 10, padB = 30;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const n = categorias.length;
+  if(n===0){ svg.appendChild(svgEl('text',{x:w/2,y:h/2,'text-anchor':'middle',fill:'#6f88a3','font-size':12})).textContent='Sin datos'; return; }
+  const groupW = plotW / n;
+  const barW = Math.min(18, groupW/2.6);
+  const maxV = 100;
+
+  // gridlines
+  [0,25,50,75,100].forEach(v=>{
+    const y = padT + plotH - (v/maxV)*plotH;
+    const l = svgEl('line',{x1:padL,x2:w-padR,y1:y,y2:y,class:'gridline'});
+    svg.appendChild(l);
+    const t = svgEl('text',{x:padL-6,y:y+3,'text-anchor':'end','class':'axis',});
+    t.textContent = v+'%'; t.setAttribute('font-size',9); t.setAttribute('fill','#6f88a3');
+    svg.appendChild(t);
+  });
+
+  categorias.forEach((cat,i)=>{
+    const cx = padL + groupW*i + groupW/2;
+    const va = seriesA[i], vb = seriesB[i];
+    const ha = (va/maxV)*plotH, hb = (vb/maxV)*plotH;
+    const rectA = svgEl('rect',{x:cx-barW-1, y:padT+plotH-ha, width:barW, height:Math.max(ha,1), rx:3, fill:colorA});
+    const rectB = svgEl('rect',{x:cx+1, y:padT+plotH-hb, width:barW, height:Math.max(hb,1), rx:3, fill:colorB});
+    svg.appendChild(rectA); svg.appendChild(rectB);
+
+    const txA = svgEl('text',{x:cx-barW/2-1,y:padT+plotH-ha-4,'text-anchor':'middle','font-size':9,fill:colorA});
+    txA.textContent = fmt(va); svg.appendChild(txA);
+    const txB = svgEl('text',{x:cx+barW/2+1,y:padT+plotH-hb-4,'text-anchor':'middle','font-size':9,fill:colorB});
+    txB.textContent = fmt(vb); svg.appendChild(txB);
+
+    const lbl = svgEl('text',{x:cx,y:h-10,'text-anchor':'middle','font-size':10,fill:'#b9c9dc'});
+    lbl.textContent = cat; svg.appendChild(lbl);
+  });
+
+  // leyenda
+  const parent = document.getElementById(containerId).parentElement;
+  let legend = parent.querySelector('.legend-row');
+  if(!legend){ legend = document.createElement('div'); legend.className='legend-row'; parent.appendChild(legend); }
+  legend.innerHTML = `<span><i class="dot" style="background:${colorA}"></i>${labelA}</span><span><i class="dot" style="background:${colorB}"></i>${labelB}</span>`;
+}
+
+function barsSingle(containerId, categorias, valores, colorFn, fmt){
+  const h = 210;
+  const {svg, w} = clearAndSize(containerId, h);
+  const padL = 34, padR = 10, padT = 10, padB = 46;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const n = categorias.length;
+  if(n===0){ svg.appendChild(svgEl('text',{x:w/2,y:h/2,'text-anchor':'middle',fill:'#6f88a3','font-size':12})).textContent='Sin datos'; return; }
+  const maxV = Math.max(...valores, 1) * 1.15;
+  const groupW = plotW / n;
+  const barW = Math.min(46, groupW*0.55);
+
+  [0,0.25,0.5,0.75,1].forEach(f=>{
+    const v = maxV*f;
+    const y = padT + plotH - f*plotH;
+    svg.appendChild(svgEl('line',{x1:padL,x2:w-padR,y1:y,y2:y,class:'gridline'}));
+    const t = svgEl('text',{x:padL-6,y:y+3,'text-anchor':'end','font-size':9,fill:'#6f88a3'});
+    t.textContent = Math.round(v); svg.appendChild(t);
+  });
+
+  categorias.forEach((cat,i)=>{
+    const cx = padL + groupW*i + groupW/2;
+    const v = valores[i];
+    const hgt = (v/maxV)*plotH;
+    const rect = svgEl('rect',{x:cx-barW/2, y:padT+plotH-hgt, width:barW, height:Math.max(hgt,1), rx:4, fill:colorFn(i,cat)});
+    svg.appendChild(rect);
+    const txt = svgEl('text',{x:cx,y:padT+plotH-hgt-6,'text-anchor':'middle','font-size':10,fill:'#f3f7fb','font-weight':600});
+    txt.textContent = fmt(v); svg.appendChild(txt);
+
+    const words = String(cat).split(' ');
+    let line1 = cat, line2 = '';
+    if(String(cat).length > 14){
+      const mid = Math.ceil(words.length/2);
+      line1 = words.slice(0,mid).join(' ');
+      line2 = words.slice(mid).join(' ');
+    }
+    const lbl1 = svgEl('text',{x:cx,y:h-30,'text-anchor':'middle','font-size':9.5,fill:'#b9c9dc'});
+    lbl1.textContent = line1; svg.appendChild(lbl1);
+    if(line2){
+      const lbl2 = svgEl('text',{x:cx,y:h-18,'text-anchor':'middle','font-size':9.5,fill:'#b9c9dc'});
+      lbl2.textContent = line2; svg.appendChild(lbl2);
+    }
+  });
+}
+
+function donutChart(containerId, segments){
+  // segments: [{label, value, color}]
+  const h = 210;
+  const {svg, w} = clearAndSize(containerId, h);
+  const cx = w*0.32, cy = h/2, rOuter = 72, rInner = 44;
+  const total = segments.reduce((a,s)=>a+s.value,0) || 1;
+  let ang = -Math.PI/2;
+  segments.forEach(s=>{
+    const frac = s.value/total;
+    const a2 = ang + frac*2*Math.PI;
+    if(frac > 0){
+      const path = donutSlice(cx,cy,rInner,rOuter,ang,a2);
+      svg.appendChild(svgEl('path',{d:path, fill:s.color}));
+    }
+    ang = a2;
+  });
+  const centerTxt = svgEl('text',{x:cx,y:cy-4,'text-anchor':'middle','font-size':20,'font-weight':800,fill:'#f3f7fb'});
+  centerTxt.textContent = segments.length ? fmtPct(segments[0].value*100/total) : '';
+  svg.appendChild(centerTxt);
+  const centerSub = svgEl('text',{x:cx,y:cy+14,'text-anchor':'middle','font-size':10,fill:'#b9c9dc'});
+  centerSub.textContent = segments[0] ? segments[0].label : '';
+  svg.appendChild(centerSub);
+
+  let ly = cy - (segments.length*20)/2 + 10;
+  segments.forEach(s=>{
+    svg.appendChild(svgEl('circle',{cx:w*0.62,cy:ly,r:5,fill:s.color}));
+    const t = svgEl('text',{x:w*0.62+12,y:ly+4,'font-size':11,fill:'#f3f7fb'});
+    t.textContent = `${s.label} ${fmtPct(s.value*100/total)}`;
+    svg.appendChild(t);
+    ly += 22;
+  });
+}
+function polarToCart(cx,cy,r,ang){ return [cx + r*Math.cos(ang), cy + r*Math.sin(ang)]; }
+function donutSlice(cx,cy,rIn,rOut,a1,a2){
+  const large = (a2-a1) > Math.PI ? 1 : 0;
+  const [x1,y1] = polarToCart(cx,cy,rOut,a1);
+  const [x2,y2] = polarToCart(cx,cy,rOut,a2);
+  const [x3,y3] = polarToCart(cx,cy,rIn,a2);
+  const [x4,y4] = polarToCart(cx,cy,rIn,a1);
+  return `M ${x1} ${y1} A ${rOut} ${rOut} 0 ${large} 1 ${x2} ${y2} L ${x3} ${y3} A ${rIn} ${rIn} 0 ${large} 0 ${x4} ${y4} Z`;
+}
+
+function distribucionCombinada(containerId, distAt, distTr){
+  const h = 230;
+  const {svg, w} = clearAndSize(containerId, h);
+  const padL = 40, padR = 20, padT = 10, padB = 34;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const cats = [5,4,3,2,1];
+  const groupW = plotW / cats.length;
+  const barW = Math.min(28, groupW/2.6);
+  const maxV = 100;
+
+  [0,25,50,75,100].forEach(v=>{
+    const y = padT + plotH - (v/maxV)*plotH;
+    svg.appendChild(svgEl('line',{x1:padL,x2:w-padR,y1:y,y2:y,class:'gridline'}));
+    const t = svgEl('text',{x:padL-6,y:y+3,'text-anchor':'end','font-size':9,fill:'#6f88a3'});
+    t.textContent = v+'%'; svg.appendChild(t);
+  });
+
+  cats.forEach((k,i)=>{
+    const cx = padL + groupW*i + groupW/2;
+    const va = distAt[k]||0, vb = distTr[k]||0;
+    const ha = (va/maxV)*plotH, hb=(vb/maxV)*plotH;
+    svg.appendChild(svgEl('rect',{x:cx-barW-1,y:padT+plotH-ha,width:barW,height:Math.max(ha,1),rx:3,fill:'#12a79c'}));
+    svg.appendChild(svgEl('rect',{x:cx+1,y:padT+plotH-hb,width:barW,height:Math.max(hb,1),rx:3,fill:'#ee9324'}));
+    const t1 = svgEl('text',{x:cx-barW/2-1,y:padT+plotH-ha-4,'text-anchor':'middle','font-size':9,fill:'#12a79c'});
+    t1.textContent = fmtPct(va); svg.appendChild(t1);
+    const t2 = svgEl('text',{x:cx+barW/2+1,y:padT+plotH-hb-4,'text-anchor':'middle','font-size':9,fill:'#ee9324'});
+    t2.textContent = fmtPct(vb); svg.appendChild(t2);
+    const lbl = svgEl('text',{x:cx,y:h-14,'text-anchor':'middle','font-size':10,fill:'#b9c9dc'});
+    lbl.textContent = SCALE_LABELS[k]; svg.appendChild(lbl);
+  });
+
+  const parent = document.getElementById(containerId).parentElement;
+  let legend = parent.querySelector('.legend-row');
+  if(!legend){ legend = document.createElement('div'); legend.className='legend-row'; parent.appendChild(legend); }
+  legend.innerHTML = `<span><i class="dot" style="background:#12a79c"></i>Atención</span><span><i class="dot" style="background:#ee9324"></i>Trabajo Realizado</span>`;
+}
+
+// ---------- Comentarios ----------
+function renderComentarios(comentarios){
+  const box = document.getElementById('comentariosBox');
+  box.innerHTML = '';
+  if(!comentarios.length){
+    box.innerHTML = '<div class="no-comments">No hay comentarios de clientes detractores para el filtro seleccionado.</div>';
+    return;
+  }
+  comentarios.forEach(c=>{
+    const div = document.createElement('div');
+    div.className = 'comment-card';
+    div.innerHTML = `
+      <div class="meta"><span>Prestador: <b>${escapeHtml(c.prestador)}</b></span><span>${escapeHtml(c.mes||'')}</span></div>
+      <p>${escapeHtml(c.comentario)}</p>`;
+    box.appendChild(div);
+  });
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ---------- Orquestacion ----------
+function renderTodo(){
+  const data = filtrar();
+  const m = calcular(data);
+  renderKPIs(m);
+
+  barsDual('chAtencionEvol', m.evolucion.map(e=>e.mes), m.evolucion.map(e=>e.posAt), m.evolucion.map(e=>e.negAt), COLORS.teal, COLORS.pink, 'Excelente/Muy bueno', 'Regular/Malo', fmtPct);
+  barsDual('chTrabajoEvol', m.evolucion.map(e=>e.mes), m.evolucion.map(e=>e.posTr), m.evolucion.map(e=>e.negTr), COLORS.orange, COLORS.pink, 'Excelente/Muy bueno', 'Regular/Malo', fmtPct);
+  barsDual('chNpsEvol', m.evolucion.map(e=>e.mes), m.evolucion.map(e=>e.pProm), m.evolucion.map(e=>e.pDet), COLORS.teal, COLORS.pink, '% Promotor', '% Detractor', fmtPct);
+
+  donutChart('chNpsDonut', [
+    {label:'Promotores', value:m.pctProm, color:COLORS.teal},
+    {label:'Pasivos', value:m.pctPas, color:COLORS.orange},
+    {label:'Detractores', value:m.pctDet, color:COLORS.pink},
+  ]);
+
+  const contactoEntries = Object.entries(m.nivelContacto).sort((a,b)=>b[1]-a[1]);
+  barsSingle('chContacto', contactoEntries.map(e=>e[0]), contactoEntries.map(e=>e[1]), ()=>COLORS.teal, v=>v);
+
+  const respuestaEntries = Object.entries(m.nivelRespuesta).sort((a,b)=>b[1]-a[1]);
+  barsSingle('chRespuesta', respuestaEntries.map(e=>e[0]), respuestaEntries.map(e=>e[1]), ()=>COLORS.orange, v=>v);
+
+  distribucionCombinada('chDistribucion', m.atencion.pct, m.trabajo.pct);
+
+  renderComentarios(m.comentarios);
+}
+
+// ---------- Init ----------
+function initFiltros(){
+  ['fMes','fArea','fCia'].forEach(id=>{
+    document.getElementById(id).addEventListener('change', renderTodo);
+  });
+  document.getElementById('clearFiltros').addEventListener('click', ()=>{
+    ['fMes','fArea','fCia'].forEach(id=>document.getElementById(id).value='');
+    renderTodo();
+  });
+  window.addEventListener('resize', debounce(renderTodo, 200));
+}
+function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
+
+function initTheme(){
+  const btn = document.getElementById('themeBtn');
+  const saved = localStorage.getItem('panel-hogar-theme') || 'dark';
+  document.body.setAttribute('data-theme', saved);
+  btn.textContent = saved==='dark' ? '🌙' : '☀️';
+  btn.addEventListener('click', ()=>{
+    const cur = document.body.getAttribute('data-theme');
+    const next = cur==='dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', next);
+    localStorage.setItem('panel-hogar-theme', next);
+    btn.textContent = next==='dark' ? '🌙' : '☀️';
+    renderTodo();
+  });
+}
+
+fetch('data.json?v=' + Date.now())
+  .then(r=>r.json())
+  .then(json=>{
+    RAW = json.registros;
+    document.getElementById('generadoPill').textContent = 'Datos actualizados: ' + (json.generado || '—');
+    poblarFiltros(RAW);
+    initFiltros();
+    initTheme();
+    renderTodo();
+  })
+  .catch(err=>{
+    document.querySelector('.wrap').innerHTML = '<p style="color:#e61c5c;padding:40px;">No se pudo cargar data.json. Verificá que el archivo esté en la misma carpeta que index.html.</p>';
+    console.error(err);
+  });
+</script>
+</body>
+</html>
