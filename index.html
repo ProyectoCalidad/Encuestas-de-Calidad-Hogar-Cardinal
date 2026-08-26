@@ -79,6 +79,16 @@ header.top{
 .stats-line .stat-val{font-size:22px;font-weight:800;color:var(--text);}
 .stats-line .stat-lbl{font-size:12.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;}
 
+.tabs{display:flex;gap:8px;margin-bottom:18px;border-bottom:1px solid var(--card-bd);}
+.tab-btn{
+  cursor:pointer;background:transparent;border:none;color:var(--text-dim);
+  font-size:14px;font-weight:700;padding:10px 4px;margin-right:22px;
+  border-bottom:3px solid transparent;
+}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--teal);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
 .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
 @media (max-width:920px){.kpi-grid{grid-template-columns:1fr;}}
 
@@ -178,6 +188,12 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
     <div class="stat"><span class="stat-val" id="countEncuestas">0</span><span class="stat-lbl">Encuestas realizadas</span></div>
   </div>
 
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="tabKpis">KPIs</button>
+    <button class="tab-btn" data-tab="tabComentarios">Comentarios</button>
+  </nav>
+
+  <div id="tabKpis" class="tab-panel active">
   <section class="kpi-grid">
     <div class="card kpi-card" id="kpiAtencion">
       <div class="kpi-label">Satisfacción con la Atención</div>
@@ -240,12 +256,15 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
       <div id="chDistribucion"></div>
     </div>
   </section>
+  </div>
 
+  <div id="tabComentarios" class="tab-panel">
   <section class="comments-section">
     <h2>Comentarios de Clientes Detractores</h2>
-    <div class="sub">Encuestas con recomendación negativa — se muestra el prestador asociado</div>
+    <div class="sub">Encuestas con recomendación negativa — se muestra el prestador y la orden de servicio asociados</div>
     <div id="comentariosBox"></div>
   </section>
+  </div>
 
   <footer>Panel generado a partir de la base de datos mensual de encuestas de satisfacción · Cardinal Assistance</footer>
 </div>
@@ -330,7 +349,7 @@ function calcular(data){
   // Comentarios detractores
   const comentarios = validos
     .filter(r=>r.recomendacion==='detractor' && r.comentario)
-    .map(r=>({prestador:r.prestador, comentario:r.comentario, mes:r.mes, mes_orden:r.mes_orden}));
+    .map(r=>({prestador:r.prestador, comentario:r.comentario, mes:r.mes, mes_orden:r.mes_orden, orden_servicio:r.orden_servicio}));
 
   // Evolucion mensual
   const mesesUnicos = [...new Set(validos.map(r=>r.mes))].sort((a,b)=>{
@@ -609,7 +628,7 @@ function renderComentarios(comentarios){
       const div = document.createElement('div');
       div.className = 'comment-card';
       div.innerHTML = `
-        <div class="meta"><span>Prestador: <b>${escapeHtml(c.prestador)}</b></span></div>
+        <div class="meta"><span>Prestador: <b>${escapeHtml(c.prestador)}</b></span><span>Orden de servicio: <b>${escapeHtml(c.orden_servicio||'—')}</b></span></div>
         <p>${escapeHtml(c.comentario)}</p>`;
       body.appendChild(div);
     });
@@ -676,6 +695,20 @@ function initTheme(){
   });
 }
 
+function initTabs(){
+  const btns = document.querySelectorAll('.tab-btn');
+  btns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      btns.forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      // los graficos SVG necesitan recalcular su ancho al hacerse visibles
+      if(btn.dataset.tab === 'tabKpis') renderTodo();
+    });
+  });
+}
+
 fetch('data.json?v=' + Date.now())
   .then(r=>r.json())
   .then(json=>{
@@ -684,6 +717,7 @@ fetch('data.json?v=' + Date.now())
     poblarFiltros(RAW);
     initFiltros();
     initTheme();
+    initTabs();
     renderTodo();
   })
   .catch(err=>{

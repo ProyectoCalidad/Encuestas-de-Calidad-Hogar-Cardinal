@@ -86,7 +86,7 @@ def main():
 
     IDX = {
         "mes": 0, "area": 1, "cia": 2, "campania": 3, "provincia": 4,
-        "servicio": 5, "prestador": 15, "gestion_tel": 23,
+        "servicio": 5, "orden_servicio": 8, "prestador": 15, "gestion_tel": 23,
         "estado_encuesta": 24, "atencion": 25, "trabajo": 26,
         "recomendacion": 27, "comentario": 28,
     }
@@ -103,6 +103,7 @@ def main():
             "cia": norm(row[IDX["cia"]]) or "Sin dato",
             "provincia": norm(row[IDX["provincia"]]) or "Sin dato",
             "servicio": norm(row[IDX["servicio"]]) or "Sin dato",
+            "orden_servicio": norm(row[IDX["orden_servicio"]]) or "Sin dato",
             "prestador": norm(row[IDX["prestador"]]) or "Sin dato",
             "gestion_tel": norm(row[IDX["gestion_tel"]]) or "Sin dato",
             "estado_encuesta": estado_encuesta_canon(row[IDX["estado_encuesta"]]),
