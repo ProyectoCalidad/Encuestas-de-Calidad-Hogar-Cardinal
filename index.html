@@ -103,6 +103,8 @@ header.top{
 .kpi-card .kpi-sub{font-size:11.5px;color:var(--text-dim);margin-bottom:10px;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
 .kpi-bar{height:3px;border-radius:3px;margin-bottom:14px;}
+.kpi-card-centered{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.kpi-card-centered .kpi-bar{width:90px;}
 .dist-row{display:flex;align-items:center;gap:8px;font-size:11.5px;margin:5px 0;color:var(--text-dim);}
 .dist-row .lbl{width:70px;flex:0 0 70px;}
 .dist-row .track{flex:1;height:8px;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden;}
@@ -189,7 +191,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
   </div>
 
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="tabKpis">KPIs</button>
+    <button class="tab-btn active" data-tab="tabKpis">Indicadores</button>
     <button class="tab-btn" data-tab="tabComentarios">Comentarios</button>
   </nav>
 
@@ -211,7 +213,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
       <div id="trDist"></div>
     </div>
 
-    <div class="card kpi-card" id="kpiNps">
+    <div class="card kpi-card kpi-card-centered" id="kpiNps">
       <div class="kpi-label">NPS (% Promotor − % Detractor)</div>
       <div class="kpi-value" id="npsVal">–</div>
       <div class="kpi-sub" id="npsSub">—</div>
@@ -221,16 +223,6 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
 
   <section class="charts-grid">
     <div class="card chart-card">
-      <h3>Evolución mensual · Calidad de Atención</h3>
-      <div class="chart-sub">% respuestas Excelente/Muy bueno vs Regular/Malo</div>
-      <div id="chAtencionEvol"></div>
-    </div>
-    <div class="card chart-card">
-      <h3>Evolución mensual · Calidad del Trabajo Realizado</h3>
-      <div class="chart-sub">% respuestas Excelente/Muy bueno vs Regular/Malo</div>
-      <div id="chTrabajoEvol"></div>
-    </div>
-    <div class="card chart-card">
       <h3>Evolución mensual · NPS</h3>
       <div class="chart-sub">% Promotor vs % Detractor por mes</div>
       <div id="chNpsEvol"></div>
@@ -239,6 +231,16 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
       <h3>NPS — Composición</h3>
       <div class="chart-sub">Promotor / Pasivo / Detractor</div>
       <div id="chNpsDonut"></div>
+    </div>
+    <div class="card chart-card">
+      <h3>Evolución mensual · Calidad de Atención</h3>
+      <div class="chart-sub">% respuestas Excelente/Muy bueno vs Regular/Malo</div>
+      <div id="chAtencionEvol"></div>
+    </div>
+    <div class="card chart-card">
+      <h3>Evolución mensual · Calidad del Trabajo Realizado</h3>
+      <div class="chart-sub">% respuestas Excelente/Muy bueno vs Regular/Malo</div>
+      <div id="chTrabajoEvol"></div>
     </div>
     <div class="card chart-card">
       <h3>Nivel de Contacto</h3>
