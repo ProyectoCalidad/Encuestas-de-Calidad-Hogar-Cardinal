@@ -188,6 +188,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
   <div class="stats-line">
     <div class="stat"><span class="stat-val" id="countCasos">0</span><span class="stat-lbl">Casos totales</span></div>
     <div class="stat"><span class="stat-val" id="countEncuestas">0</span><span class="stat-lbl">Encuestas realizadas</span></div>
+    <div class="stat"><span class="stat-val" id="countParciales">0</span><span class="stat-lbl">Encuestas parciales</span></div>
   </div>
 
   <nav class="tabs">
@@ -379,8 +380,9 @@ function calcular(data){
   const nivelContacto = countBy(data, 'gestion_tel');
   const nivelRespuesta = countBy(data, 'estado_encuesta');
   const encuestasRealizadas = nivelRespuesta['Encuesta Realizada'] || 0;
+  const encuestasParciales = nivelRespuesta['Parcial'] || 0;
 
-  return { atencion, trabajo, nps, pctProm, pctPas, pctDet, comentarios, evolucion, nivelContacto, nivelRespuesta, totalCasos: data.length, totalEncuestas: validos.length, encuestasRealizadas };
+  return { atencion, trabajo, nps, pctProm, pctPas, pctDet, comentarios, evolucion, nivelContacto, nivelRespuesta, totalCasos: data.length, totalEncuestas: validos.length, encuestasRealizadas, encuestasParciales };
 }
 function countBy(arr, campo){
   const m = {};
@@ -417,6 +419,7 @@ function renderKPIs(m){
 
   document.getElementById('countCasos').textContent = m.totalCasos;
   document.getElementById('countEncuestas').textContent = m.encuestasRealizadas;
+  document.getElementById('countParciales').textContent = m.encuestasParciales;
 }
 
 // ---------- Charts (SVG nativo) ----------
