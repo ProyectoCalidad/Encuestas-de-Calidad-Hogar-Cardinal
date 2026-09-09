@@ -262,17 +262,17 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
     </div>
     <div class="card chart-card">
       <h3>Ranking por Servicio</h3>
-      <div class="chart-sub">Top 9 + Otros · cantidad de casos, color según satisfacción</div>
+      <div class="chart-sub">Top 9 + Otros · encuestas realizadas o parciales, color según satisfacción</div>
       <div id="chRankingServicio"></div>
     </div>
     <div class="card chart-card">
       <h3>Ranking por Provincia</h3>
-      <div class="chart-sub">Top 9 + Otros · cantidad de casos, color según satisfacción</div>
+      <div class="chart-sub">Top 9 + Otros · encuestas realizadas o parciales, color según satisfacción</div>
       <div id="chRankingProvincia"></div>
     </div>
     <div class="card chart-card chart-wide">
       <h3>Ranking por Prestador</h3>
-      <div class="chart-sub">Top 9 + Otros · cantidad de casos, color según satisfacción (excluye prestadores sin identificar)</div>
+      <div class="chart-sub">Top 9 + Otros · encuestas realizadas o parciales, color según satisfacción (excluye prestadores sin identificar)</div>
       <div id="chRankingPrestador"></div>
     </div>
   </section>
@@ -674,9 +674,9 @@ function esVacioTexto(v){
 }
 function computarRanking(data, campo, opciones){
   opciones = opciones || {};
-  let universo = data;
+  let universo = data.filter(esValida);
   if(opciones.excluirVacios){
-    universo = data.filter(r=>!esVacioTexto(r[campo]));
+    universo = universo.filter(r=>!esVacioTexto(r[campo]));
   }
   const total = universo.length || 1;
   const counts = {};
