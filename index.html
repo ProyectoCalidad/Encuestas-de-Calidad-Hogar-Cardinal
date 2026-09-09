@@ -313,7 +313,7 @@ function poblarFiltros(data){
   });
   const areas = [...new Set(data.map(r=>r.area))].sort();
   const cias = [...new Set(data.map(r=>r.cia))].sort();
-  const provincias = [...new Set(data.map(r=>r.provincia))].sort();
+  const provincias = [...new Set(data.map(r=>r.provincia))].filter(v=>!esVacioTexto(v)).sort();
 
   fillSelect('fMes', meses, 'Mes: todos');
   fillSelect('fArea', areas, 'Área: todas');
