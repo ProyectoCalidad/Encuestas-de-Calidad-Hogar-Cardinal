@@ -183,6 +183,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
     <select id="fMes"><option value="">Mes: todos</option></select>
     <select id="fArea"><option value="">Área: todas</option></select>
     <select id="fCia"><option value="">Cía: todas</option></select>
+    <select id="fProvincia"><option value="">Provincia: todas</option></select>
     <button class="clear" id="clearFiltros">Limpiar filtros</button>
   </div>
 
@@ -259,6 +260,21 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
       <div class="chart-sub">Atención vs Trabajo Realizado — % por categoría</div>
       <div id="chDistribucion"></div>
     </div>
+    <div class="card chart-card">
+      <h3>Ranking por Servicio</h3>
+      <div class="chart-sub">Top 9 + Otros · cantidad de casos, color según satisfacción</div>
+      <div id="chRankingServicio"></div>
+    </div>
+    <div class="card chart-card">
+      <h3>Ranking por Provincia</h3>
+      <div class="chart-sub">Top 9 + Otros · cantidad de casos, color según satisfacción</div>
+      <div id="chRankingProvincia"></div>
+    </div>
+    <div class="card chart-card chart-wide">
+      <h3>Ranking por Prestador</h3>
+      <div class="chart-sub">Top 9 + Otros · cantidad de casos, color según satisfacción (excluye prestadores sin identificar)</div>
+      <div id="chRankingPrestador"></div>
+    </div>
   </section>
   </div>
 
@@ -297,10 +313,12 @@ function poblarFiltros(data){
   });
   const areas = [...new Set(data.map(r=>r.area))].sort();
   const cias = [...new Set(data.map(r=>r.cia))].sort();
+  const provincias = [...new Set(data.map(r=>r.provincia))].sort();
 
   fillSelect('fMes', meses, 'Mes: todos');
   fillSelect('fArea', areas, 'Área: todas');
   fillSelect('fCia', cias, 'Cía: todas');
+  fillSelect('fProvincia', provincias, 'Provincia: todas');
 }
 function fillSelect(id, values, placeholder){
   const sel = document.getElementById(id);
@@ -315,10 +333,12 @@ function filtrar(){
   const m = document.getElementById('fMes').value;
   const a = document.getElementById('fArea').value;
   const c = document.getElementById('fCia').value;
+  const p = document.getElementById('fProvincia').value;
   return RAW.filter(r=>
     (!m || r.mes===m) &&
     (!a || r.area===a) &&
-    (!c || r.cia===c)
+    (!c || r.cia===c) &&
+    (!p || r.provincia===p)
   );
 }
 
@@ -647,6 +667,103 @@ function escapeHtml(s){
 }
 
 // ---------- Orquestacion ----------
+// ---------- Rankings (Servicio / Provincia / Prestador) ----------
+const VACIOS_TEXTO = new Set(['', 'SIN DATO', '0', '#N/D', 'N/D', '#N/A', 'NA', 'S/D']);
+function esVacioTexto(v){
+  return VACIOS_TEXTO.has((v||'').toString().trim().toUpperCase());
+}
+function computarRanking(data, campo, opciones){
+  opciones = opciones || {};
+  let universo = data;
+  if(opciones.excluirVacios){
+    universo = data.filter(r=>!esVacioTexto(r[campo]));
+  }
+  const total = universo.length || 1;
+  const counts = {};
+  universo.forEach(r=>{
+    const k = r[campo] || 'Sin dato';
+    counts[k] = (counts[k]||0) + 1;
+  });
+  const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const top = entries.slice(0,9);
+  const resto = entries.slice(9);
+  const restoLabels = new Set(resto.map(e=>e[0]));
+
+  const items = top.map(([label,count])=>({label, count, pct: count*100/total}));
+  if(resto.length){
+    const restoCount = resto.reduce((a,e)=>a+e[1],0);
+    items.push({label:'Otros', count: restoCount, pct: restoCount*100/total, esOtros:true});
+  }
+
+  items.forEach(it=>{
+    const regs = universo.filter(r=>{
+      const k = r[campo] || 'Sin dato';
+      return esValida(r) && (it.esOtros ? restoLabels.has(k) : k===it.label);
+    });
+    const vals = [];
+    regs.forEach(r=>{
+      if(r.atencion!=null) vals.push(r.atencion);
+      if(r.trabajo!=null) vals.push(r.trabajo);
+    });
+    it.avgSat = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  });
+
+  return items;
+}
+
+function colorSatisfaccion(avg){
+  if(avg===null || avg===undefined || isNaN(avg)) return '#5b7288';
+  const t = Math.max(0, Math.min(1, (avg-1)/4));
+  const pink=[230,28,92], orange=[238,147,36], teal=[18,167,156];
+  function lerp(a,b,f){ return Math.round(a+(b-a)*f); }
+  let c;
+  if(t<0.5){ const f=t/0.5; c=[lerp(pink[0],orange[0],f),lerp(pink[1],orange[1],f),lerp(pink[2],orange[2],f)]; }
+  else { const f=(t-0.5)/0.5; c=[lerp(orange[0],teal[0],f),lerp(orange[1],teal[1],f),lerp(orange[2],teal[2],f)]; }
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+
+function horizontalRanking(containerId, items){
+  const rowH = 32;
+  const padT = 6, padB = 10, padR = 70;
+  const h = padT + Math.max(items.length,1)*rowH + padB;
+  const {svg, w} = clearAndSize(containerId, h);
+  if(!items.length){
+    svg.appendChild(svgEl('text',{x:w/2,y:h/2,'text-anchor':'middle',fill:'#6f88a3','font-size':12})).textContent='Sin datos';
+    return;
+  }
+  const labelW = Math.min(230, Math.max(110, w*0.30));
+  const barX = 8 + labelW;
+  const plotW = Math.max(w - barX - padR, 40);
+  const maxV = Math.max(...items.map(i=>i.count), 1);
+
+  items.forEach((it,i)=>{
+    const y = padT + i*rowH;
+    const barW = (it.count/maxV) * plotW;
+    const color = colorSatisfaccion(it.avgSat);
+
+    let text = String(it.label);
+    if(text.length>28) text = text.slice(0,26)+'…';
+    const lbl = svgEl('text',{x:barX-8, y:y+rowH/2+4, 'text-anchor':'end','font-size':11,fill:'#f3f7fb'});
+    lbl.textContent = text;
+    const titleEl = svgEl('title',{});
+    titleEl.textContent = it.label + (it.avgSat!=null ? ` · satisfacción ${fmtNum(it.avgSat)}` : '');
+    lbl.appendChild(titleEl);
+    svg.appendChild(lbl);
+
+    const rect = svgEl('rect',{x:barX, y:y+5, width:Math.max(barW,3), height:rowH-12, rx:4, fill:color});
+    svg.appendChild(rect);
+
+    const val = svgEl('text',{x:barX+barW+8, y:y+rowH/2+4, 'font-size':11, fill:'#f3f7fb','font-weight':600});
+    val.textContent = `${it.count} (${fmtPct(it.pct)})`;
+    svg.appendChild(val);
+  });
+
+  const parent = document.getElementById(containerId).parentElement;
+  let legend = parent.querySelector('.legend-row');
+  if(!legend){ legend = document.createElement('div'); legend.className='legend-row'; parent.appendChild(legend); }
+  legend.innerHTML = `<span style="display:flex;align-items:center;gap:6px;">Color = satisfacción promedio del grupo <span style="display:inline-block;width:70px;height:8px;border-radius:4px;background:linear-gradient(90deg,#e61c5c,#ee9324,#12a79c);"></span> baja → alta</span>`;
+}
+
 function renderTodo(){
   const data = filtrar();
   const m = calcular(data);
@@ -670,16 +787,20 @@ function renderTodo(){
 
   distribucionCombinada('chDistribucion', m.atencion.pct, m.trabajo.pct);
 
+  horizontalRanking('chRankingServicio', computarRanking(data, 'servicio'));
+  horizontalRanking('chRankingProvincia', computarRanking(data, 'provincia', {excluirVacios:true}));
+  horizontalRanking('chRankingPrestador', computarRanking(data, 'prestador', {excluirVacios:true}));
+
   renderComentarios(m.comentarios);
 }
 
 // ---------- Init ----------
 function initFiltros(){
-  ['fMes','fArea','fCia'].forEach(id=>{
+  ['fMes','fArea','fCia','fProvincia'].forEach(id=>{
     document.getElementById(id).addEventListener('change', renderTodo);
   });
   document.getElementById('clearFiltros').addEventListener('click', ()=>{
-    ['fMes','fArea','fCia'].forEach(id=>document.getElementById(id).value='');
+    ['fMes','fArea','fCia','fProvincia'].forEach(id=>document.getElementById(id).value='');
     renderTodo();
   });
   window.addEventListener('resize', debounce(renderTodo, 200));
