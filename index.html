@@ -189,7 +189,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
 
   <div class="stats-line">
     <div class="stat"><span class="stat-val" id="countCasos">0</span><span class="stat-lbl">Casos totales</span></div>
-    <div class="stat"><span class="stat-val" id="countEncuestas">0</span><span class="stat-lbl">Encuestas realizadas</span></div>
+    <div class="stat"><span class="stat-val" id="countEncuestas">0</span><span class="stat-lbl">Encuestas completas</span></div>
     <div class="stat"><span class="stat-val" id="countParciales">0</span><span class="stat-lbl">Encuestas parciales</span></div>
   </div>
 
@@ -203,7 +203,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
     <div class="card kpi-card" id="kpiAtencion">
       <div class="kpi-label">Satisfacción con la Atención</div>
       <div class="kpi-value" id="atVal">–</div>
-      <div class="kpi-sub" id="atSub">Escala 1 a 5 · encuestas realizadas o parciales</div>
+      <div class="kpi-sub" id="atSub">Escala 1 a 5 · encuestas completas o parciales</div>
       <div class="kpi-bar" style="background:var(--teal)"></div>
       <div id="atDist"></div>
     </div>
@@ -211,7 +211,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
     <div class="card kpi-card" id="kpiTrabajo">
       <div class="kpi-label">Satisfacción con el Trabajo Realizado</div>
       <div class="kpi-value" id="trVal">–</div>
-      <div class="kpi-sub" id="trSub">Escala 1 a 5 · encuestas realizadas o parciales</div>
+      <div class="kpi-sub" id="trSub">Escala 1 a 5 · encuestas completas o parciales</div>
       <div class="kpi-bar" style="background:var(--orange)"></div>
       <div id="trDist"></div>
     </div>
@@ -262,17 +262,17 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
     </div>
     <div class="card chart-card">
       <h3>Ranking por Servicio</h3>
-      <div class="chart-sub">Top 9 + Otros · encuestas realizadas o parciales, color según satisfacción</div>
+      <div class="chart-sub">Top 9 + Otros · encuestas completas o parciales, color según satisfacción</div>
       <div id="chRankingServicio"></div>
     </div>
     <div class="card chart-card">
       <h3>Ranking por Provincia</h3>
-      <div class="chart-sub">Top 9 + Otros · encuestas realizadas o parciales, color según satisfacción</div>
+      <div class="chart-sub">Top 9 + Otros · encuestas completas o parciales, color según satisfacción</div>
       <div id="chRankingProvincia"></div>
     </div>
     <div class="card chart-card chart-wide">
       <h3>Ranking por Prestador</h3>
-      <div class="chart-sub">Top 9 + Otros · encuestas realizadas o parciales, color según satisfacción (excluye prestadores sin identificar)</div>
+      <div class="chart-sub">Top 9 + Otros · encuestas completas o parciales, color según satisfacción (excluye prestadores sin identificar)</div>
       <div id="chRankingPrestador"></div>
     </div>
   </section>
@@ -436,7 +436,7 @@ function renderKPIs(m){
   renderDist('trDist', m.trabajo.pct);
 
   document.getElementById('npsVal').textContent = m.totalEncuestas ? fmtPct(m.nps) : '–';
-  document.getElementById('npsSub').textContent = `${m.totalEncuestas} encuestas consideradas (realizadas + parciales)`;
+  document.getElementById('npsSub').textContent = `${m.totalEncuestas} encuestas consideradas (completas + parciales)`;
 
   document.getElementById('countCasos').textContent = m.totalCasos;
   document.getElementById('countEncuestas').textContent = m.encuestasRealizadas;
