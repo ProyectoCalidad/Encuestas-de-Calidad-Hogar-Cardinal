@@ -182,7 +182,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
   <div class="filters">
     <select id="fMes"><option value="">Mes: todos</option></select>
     <select id="fArea"><option value="">Área: todas</option></select>
-    <select id="fCia"><option value="">Cía: todas</option></select>
+    <select id="fCia" class="filtro-cia"><option value="">Cía: todas</option></select>
     <select id="fProvincia"><option value="">Provincia: todas</option></select>
     <button class="clear" id="clearFiltros">Limpiar filtros</button>
   </div>
@@ -195,7 +195,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
 
   <nav class="tabs">
     <button class="tab-btn active" data-tab="tabKpis">Indicadores</button>
-    <button class="tab-btn" data-tab="tabComentarios">Comentarios</button>
+    <button class="tab-btn" data-tab="tabComentarios" id="btnTabComentarios">Comentarios</button>
   </nav>
 
   <div id="tabKpis" class="tab-panel active">
@@ -270,7 +270,7 @@ footer{margin-top:34px;text-align:center;font-size:11.5px;color:var(--text-dim);
       <div class="chart-sub">Top 9 + Otros · encuestas completas o parciales, color según satisfacción</div>
       <div id="chRankingProvincia"></div>
     </div>
-    <div class="card chart-card chart-wide">
+    <div class="card chart-card chart-wide" id="cardRankingPrestador">
       <h3>Ranking por Prestador</h3>
       <div class="chart-sub">Top 9 + Otros · encuestas completas o parciales, color según satisfacción (excluye prestadores sin identificar)</div>
       <div id="chRankingPrestador"></div>
@@ -789,9 +789,10 @@ function renderTodo(){
 
   horizontalRanking('chRankingServicio', computarRanking(data, 'servicio'));
   horizontalRanking('chRankingProvincia', computarRanking(data, 'provincia', {excluirVacios:true}));
-  horizontalRanking('chRankingPrestador', computarRanking(data, 'prestador', {excluirVacios:true}));
-
-  renderComentarios(m.comentarios);
+  if(!VISTA_CLIENTE){
+    horizontalRanking('chRankingPrestador', computarRanking(data, 'prestador', {excluirVacios:true}));
+    renderComentarios(m.comentarios);
+  }
 }
 
 // ---------- Init ----------
@@ -836,13 +837,27 @@ function initTabs(){
   });
 }
 
+let VISTA_CLIENTE = false;
+
+function aplicarVistaCliente(){
+  // Oculta lo que no corresponde compartir en un informe individual por cliente:
+  // pestaña de Comentarios, ranking por Prestador, y el filtro de Cía (ya viene acotado a una sola).
+  document.getElementById('btnTabComentarios').style.display = 'none';
+  document.getElementById('cardRankingPrestador').style.display = 'none';
+  const fCia = document.getElementById('fCia');
+  fCia.style.display = 'none';
+  fCia.value = '';
+}
+
 function iniciarPanel(json){
   RAW = json.registros;
+  VISTA_CLIENTE = !!json.vistaCliente;
   document.getElementById('generadoPill').textContent = 'Datos actualizados: ' + (json.generado || '—');
   poblarFiltros(RAW);
   initFiltros();
   initTheme();
   initTabs();
+  if(VISTA_CLIENTE) aplicarVistaCliente();
   renderTodo();
 }
 
