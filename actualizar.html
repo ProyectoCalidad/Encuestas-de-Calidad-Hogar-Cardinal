@@ -145,14 +145,14 @@ footer{margin-top:30px;text-align:center;font-size:11.5px;color:var(--text-dim);
     </select>
     <div>
       <a class="btn" id="downloadClientePanelBtn" style="background:var(--teal);">Descargar panel del cliente (.html)</a>
-      <a class="btn" id="downloadClienteDetalleBtn" style="background:var(--orange);color:#2b1600;">Descargar archivo de detalle (.csv)</a>
+      <a class="btn" id="downloadClienteDetalleBtn" style="background:var(--orange);color:#2b1600;">Descargar archivo de detalle (.xlsx)</a>
     </div>
     <div class="warn-box" id="clienteHelp" style="display:none;background:rgba(18,167,156,0.10);border-color:rgba(18,167,156,0.35);margin-top:14px;">
       <b style="color:var(--teal);">Panel del cliente</b>: mismo panel interactivo, filtrado a esa Cía únicamente,
       sin pestaña de Comentarios ni Ranking por Prestador.<br>
-      <b style="color:var(--orange);">Archivo de detalle</b>: CSV con Orden de Servicio, N° de Póliza, Fecha de
-      Servicio, Fecha de Encuesta, Estado de Encuesta y las 3 calificaciones — incluye todos los casos de esa
-      Cía (hayan respondido o no). Es para uso interno de Cardinal, no para enviar al cliente.
+      <b style="color:var(--orange);">Archivo de detalle</b>: planilla de Excel (.xlsx) con Orden de Servicio, N° de Póliza,
+      Fecha de Servicio, Fecha de Encuesta, Estado de Encuesta y las 3 calificaciones — incluye todos los casos de
+      esa Cía (hayan respondido o no). Es para uso interno de Cardinal, no para enviar al cliente.
     </div>
   </div>
 
@@ -686,6 +686,177 @@ function sufijoArchivo(){
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
 }
 
+// ---------- Escritor mínimo de .xlsx (ZIP + OOXML), sin librerías externas ----------
+function crc32(bytes){
+  let c, crcTable = crc32.table || (crc32.table = (()=>{
+    const t = [];
+    for(let n=0;n<256;n++){
+      c = n;
+      for(let k=0;k<8;k++) c = (c&1) ? (0xEDB88320 ^ (c>>>1)) : (c>>>1);
+      t[n] = c;
+    }
+    return t;
+  })());
+  let crc = 0 ^ (-1);
+  for(let i=0;i<bytes.length;i++) crc = (crc>>>8) ^ crcTable[(crc^bytes[i]) & 0xFF];
+  return (crc ^ (-1)) >>> 0;
+}
+function strToBytes(str){ return new TextEncoder().encode(str); }
+function dosDateTime(){
+  // fecha/hora fija razonable para el ZIP (no afecta la apertura del archivo)
+  return {time: 0, date: 0x21}; // 1/1/1980, hora 0 — valor valido minimo
+}
+function u16(n){ return [n&0xFF, (n>>>8)&0xFF]; }
+function u32(n){ return [n&0xFF, (n>>>8)&0xFF, (n>>>16)&0xFF, (n>>>24)&0xFF]; }
+
+function crearZip(archivos){
+  // archivos: [{nombre, contenido(string)}]
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+  const {time, date} = dosDateTime();
+
+  archivos.forEach(({nombre, contenido})=>{
+    const dataBytes = strToBytes(contenido);
+    const nameBytes = strToBytes(nombre);
+    const crc = crc32(dataBytes);
+    const size = dataBytes.length;
+
+    const localHeader = new Uint8Array([
+      ...u32(0x04034b50), ...u16(20), ...u16(0), ...u16(0), ...u16(time), ...u16(date),
+      ...u32(crc), ...u32(size), ...u32(size), ...u16(nameBytes.length), ...u16(0),
+    ]);
+    localParts.push(localHeader, nameBytes, dataBytes);
+
+    const centralHeader = new Uint8Array([
+      ...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0), ...u16(0), ...u16(time), ...u16(date),
+      ...u32(crc), ...u32(size), ...u32(size), ...u16(nameBytes.length), ...u16(0), ...u16(0),
+      ...u16(0), ...u16(0), ...u32(0), ...u32(offset),
+    ]);
+    centralParts.push(centralHeader, nameBytes);
+
+    offset += localHeader.length + nameBytes.length + dataBytes.length;
+  });
+
+  const centralStart = offset;
+  let centralSize = 0;
+  centralParts.forEach(p=>centralSize+=p.length);
+
+  const eocd = new Uint8Array([
+    ...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(archivos.length), ...u16(archivos.length),
+    ...u32(centralSize), ...u32(centralStart), ...u16(0),
+  ]);
+
+  const total = [...localParts, ...centralParts, eocd];
+  const totalLen = total.reduce((a,p)=>a+p.length,0);
+  const out = new Uint8Array(totalLen);
+  let pos = 0;
+  total.forEach(p=>{ out.set(p, pos); pos += p.length; });
+  return out;
+}
+
+function xmlEsc(s){
+  return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[m]));
+}
+function colLetter(idx){
+  let s=''; idx++;
+  while(idx>0){ const rem=(idx-1)%26; s=String.fromCharCode(65+rem)+s; idx=Math.floor((idx-1)/26); }
+  return s;
+}
+
+// headers: array de strings. filas: array de arrays de valores (string/number/null).
+// colTextoForzado: indice (0-based) de la columna que debe forzarse como texto (ej. N de Poliza).
+function generarXlsx(headers, filas, colTextoForzado){
+  const CONTENT_TYPES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`;
+
+  const RELS = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+
+  const WORKBOOK = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<sheets><sheet name="Detalle" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`;
+
+  const WORKBOOK_RELS = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+
+  const STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<fonts count="2">
+<font><sz val="11"/><name val="Calibri"/></font>
+<font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font>
+</fonts>
+<fills count="3">
+<fill><patternFill patternType="none"/></fill>
+<fill><patternFill patternType="gray125"/></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FF0E3866"/><bgColor indexed="64"/></patternFill></fill>
+</fills>
+<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="3">
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>
+<xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+</cellXfs>
+</styleSheet>`;
+
+  const anchosCol = headers.map((h,i)=> i===colTextoForzado ? 16 : Math.max(12, Math.min(32, h.length+2)));
+  const colsXml = '<cols>' + anchosCol.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('') + '</cols>';
+
+  const filasXml = [];
+  const headerCells = headers.map((h,c)=>`<c r="${colLetter(c)}1" t="inlineStr" s="1"><is><t>${xmlEsc(h)}</t></is></c>`).join('');
+  filasXml.push(`<row r="1">${headerCells}</row>`);
+
+  filas.forEach((fila, ridx)=>{
+    const r = ridx+2;
+    const celdas = fila.map((val, c)=>{
+      const ref = `${colLetter(c)}${r}`;
+      const esTexto = (c===colTextoForzado);
+      const styleAttr = esTexto ? ' s="2"' : '';
+      if(esTexto){
+        return `<c r="${ref}" t="inlineStr"${styleAttr}><is><t>${xmlEsc(val)}</t></is></c>`;
+      }
+      if(typeof val === 'number'){
+        return `<c r="${ref}"><v>${val}</v></c>`;
+      }
+      if(val === '' || val === null || val === undefined){
+        return `<c r="${ref}"/>`;
+      }
+      return `<c r="${ref}" t="inlineStr"><is><t>${xmlEsc(val)}</t></is></c>`;
+    }).join('');
+    filasXml.push(`<row r="${r}">${celdas}</row>`);
+  });
+
+  const SHEET = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+${colsXml}
+<sheetData>${filasXml.join('')}</sheetData>
+</worksheet>`;
+
+  const zipBytes = crearZip([
+    {nombre:'[Content_Types].xml', contenido:CONTENT_TYPES},
+    {nombre:'_rels/.rels', contenido:RELS},
+    {nombre:'xl/workbook.xml', contenido:WORKBOOK},
+    {nombre:'xl/_rels/workbook.xml.rels', contenido:WORKBOOK_RELS},
+    {nombre:'xl/styles.xml', contenido:STYLES},
+    {nombre:'xl/worksheets/sheet1.xml', contenido:SHEET},
+  ]);
+
+  return new Blob([zipBytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+
 function generarInformesCliente(cia){
   if(!cia) return;
 
@@ -711,24 +882,24 @@ function generarInformesCliente(cia){
   downloadClientePanelBtn.href = clientePanelUrl;
   downloadClientePanelBtn.download = `Informe-${cia.replace(/[^\w\-]+/g,'')}-Hogar_${sufijoArchivo()}.html`;
 
-  // --- Archivo de detalle (CSV, uso interno, incluye todos los casos) ---
+  // --- Archivo de detalle (.xlsx real, uso interno, incluye todos los casos) ---
   const filasDetalle = DETALLE_GLOBAL.filter(d=>d.cia===cia);
-  const headers = ['Orden de Servicio','N° de Poliza','Fecha de Servicio','Fecha de Encuesta','Estado de Encuesta','Atencion','Trabajo','Recomendacion'];
-  const csvLineas = [headers.join(';')];
-  filasDetalle.forEach(d=>{
-    const fila = [
-      d.orden_servicio, d.nro_poliza, d.fecha_servicio, d.fecha_encuesta, d.estado_encuesta,
-      d.atencion ?? '', d.trabajo ?? '', d.recomendacion ?? '',
-    ].map(csvEscape);
-    csvLineas.push(fila.join(';'));
-  });
-  const csvBlob = new Blob(['\uFEFF'+csvLineas.join('\r\n')], {type:'text/csv;charset=utf-8'});
+  const headers = ['Orden de Servicio','N° de Póliza','Fecha de Servicio','Fecha de Encuesta','Estado de Encuesta','Atención','Trabajo','Recomendación'];
+  const filasXlsx = filasDetalle.map(d=>[
+    d.orden_servicio, d.nro_poliza, d.fecha_servicio, d.fecha_encuesta, d.estado_encuesta,
+    d.atencion ?? '', d.trabajo ?? '', capitalizar(d.recomendacion),
+  ]);
+  const xlsxBlob = generarXlsx(headers, filasXlsx, 1); // columna 1 = N de Poliza, forzada a texto
   if(clienteDetalleUrl) URL.revokeObjectURL(clienteDetalleUrl);
-  clienteDetalleUrl = URL.createObjectURL(csvBlob);
+  clienteDetalleUrl = URL.createObjectURL(xlsxBlob);
   downloadClienteDetalleBtn.href = clienteDetalleUrl;
-  downloadClienteDetalleBtn.download = `Detalle-${cia.replace(/[^\w\-]+/g,'')}-Hogar_${sufijoArchivo()}.csv`;
+  downloadClienteDetalleBtn.download = `Detalle-${cia.replace(/[^\w\-]+/g,'')}-Hogar_${sufijoArchivo()}.xlsx`;
 
   clienteHelp.style.display = 'block';
+}
+function capitalizar(s){
+  if(!s) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 function csvEscape(v){
   const s = String(v ?? '');
