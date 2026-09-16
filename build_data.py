@@ -70,8 +70,18 @@ def mes_orden_val(dt):
 
 
 def num_1_5(v):
-    if isinstance(v, (int, float)) and 1 <= v <= 5:
-        return int(v) if float(v).is_integer() else round(v, 2)
+    if isinstance(v, (int, float)):
+        if 1 <= v <= 5:
+            return int(v) if float(v).is_integer() else round(v, 2)
+        return None
+    if isinstance(v, str):
+        s = v.strip().replace(",", ".")
+        try:
+            n = float(s)
+        except ValueError:
+            return None
+        if 1 <= n <= 5:
+            return int(n) if n.is_integer() else round(n, 2)
     return None
 
 

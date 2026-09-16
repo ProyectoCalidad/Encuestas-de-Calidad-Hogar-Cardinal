@@ -95,3 +95,43 @@ También soporta que el CSV venga separado por coma o por punto y coma
 El panel tiene 3 segmentadores (Mes, Área, Cía) que recalculan todo en vivo:
 KPIs, los 7 gráficos y los comentarios, en ambas pestañas. No hace falta tocar
 nada del código para que funcionen con datos nuevos.
+
+## Versión "panel completo" (para guardar en una carpeta compartida / red)
+Además de `data.json`, `actualizar.html` tiene un segundo botón: **"Descargar
+panel completo (.html)"**. Genera un único archivo HTML con los datos ya
+incrustados adentro (no depende de `data.json` ni de la carpeta `img/`), así
+que se puede guardar en cualquier carpeta — por ejemplo la ruta de red
+`U:\Compartido Cerrito\...` — y se abre con doble clic sin necesitar internet
+ni ningún otro archivo. Los filtros y todo lo demás funcionan igual.
+
+Esa copia queda **fija** con los datos del momento en que se generó — no se
+actualiza sola. Para tener una versión más reciente ahí, hay que repetir el
+proceso (cargar el CSV nuevo en `actualizar.html` y descargar el panel
+completo de nuevo, reemplazando el archivo anterior en esa carpeta).
+
+## Informes individuales por cliente (Segurcoop, Triunfo, etc.)
+
+Al procesar el CSV, `actualizar.html` muestra una tarjeta nueva **"Informe
+individual por cliente"** con un desplegable armado automáticamente a partir
+de la columna Cía. Al elegir un cliente, genera dos archivos:
+
+1. **Panel del cliente (.html)** — el mismo panel interactivo, pero filtrado
+   a esa Cía únicamente y sin filtro de Cía (ya no hace falta). No incluye
+   la pestaña "Comentarios" ni el gráfico "Ranking por Prestador" — se
+   excluyeron a pedido de Luis (Cardinal). Se envía por mail como adjunto,
+   se abre con doble clic, no necesita internet.
+2. **Archivo de detalle (.csv)** — uso **interno**, no para mandar al
+   cliente. Incluye Orden de Servicio, N° de Póliza, Fecha de Servicio,
+   Fecha de Encuesta, Estado de Encuesta y las 3 calificaciones (Atención,
+   Trabajo, Recomendación), para **todos** los casos de esa Cía (hayan
+   respondido la encuesta o no).
+
+Los dos se descargan con nombre y fecha automáticos, ej.
+`Informe-SEGURCOOP-Hogar_2026-09.html` y `Detalle-SEGURCOOP-Hogar_2026-09.csv`.
+
+**Importante sobre privacidad**: el N° de Póliza y las fechas nunca se
+incluyen en el panel general (`data.json` ni el panel completo) — solo
+existen dentro del archivo de detalle, que se genera aparte y no se sube a
+ningún repositorio público. Los comentarios de texto libre tampoco se
+incrustan en el archivo del cliente, aunque la fila de origen sí los tenga
+— se eliminan antes de generar el archivo, no solo se ocultan visualmente.

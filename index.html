@@ -403,7 +403,7 @@ function calcular(data){
   const encuestasRealizadas = nivelRespuesta['Encuesta Realizada'] || 0;
   const encuestasParciales = nivelRespuesta['Parcial'] || 0;
 
-  return { atencion, trabajo, nps, pctProm, pctPas, pctDet, comentarios, evolucion, nivelContacto, nivelRespuesta, totalCasos: data.length, totalEncuestas: validos.length, encuestasRealizadas, encuestasParciales };
+  return { atencion, trabajo, nps, pctProm, pctPas, pctDet, comentarios, evolucion, nivelContacto, nivelRespuesta, totalCasos: data.length, totalEncuestas: validos.length, encuestasRealizadas, encuestasParciales, nNps: npsBase.length };
 }
 function countBy(arr, campo){
   const m = {};
@@ -435,8 +435,8 @@ function renderKPIs(m){
   document.getElementById('trSub').textContent = `Escala 1 a 5 · ${m.trabajo.n} respuestas`;
   renderDist('trDist', m.trabajo.pct);
 
-  document.getElementById('npsVal').textContent = m.totalEncuestas ? fmtPct(m.nps) : '–';
-  document.getElementById('npsSub').textContent = `${m.totalEncuestas} encuestas consideradas (completas + parciales)`;
+  document.getElementById('npsVal').textContent = m.nNps ? fmtPct(m.nps) : '–';
+  document.getElementById('npsSub').textContent = `${m.nNps} respuestas`;
 
   document.getElementById('countCasos').textContent = m.totalCasos;
   document.getElementById('countEncuestas').textContent = m.encuestasRealizadas;
