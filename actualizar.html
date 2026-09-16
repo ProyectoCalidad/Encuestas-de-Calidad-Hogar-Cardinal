@@ -151,8 +151,8 @@ footer{margin-top:30px;text-align:center;font-size:11.5px;color:var(--text-dim);
       <b style="color:var(--teal);">Panel del cliente</b>: mismo panel interactivo, filtrado a esa Cía únicamente,
       sin pestaña de Comentarios ni Ranking por Prestador.<br>
       <b style="color:var(--orange);">Archivo de detalle</b>: planilla de Excel (.xlsx) con Orden de Servicio, N° de Póliza,
-      Fecha de Servicio, Fecha de Encuesta, Estado de Encuesta y las 3 calificaciones — incluye todos los casos de
-      esa Cía (hayan respondido o no). Es para uso interno de Cardinal, no para enviar al cliente.
+      Asegurado, Fecha de Servicio, Fecha de Encuesta, Estado de Encuesta y las 3 calificaciones — incluye todos
+      los casos de esa Cía (hayan respondido o no). Es para uso interno de Cardinal, no para enviar al cliente.
     </div>
   </div>
 
@@ -466,7 +466,7 @@ const IDX = {
   mes:0, area:1, cia:2, campania:3, provincia:4, servicio:5,
   fecha_servicio:7, orden_servicio:8, nro_poliza:10, prestador:15, gestion_tel:23,
   estado_encuesta:24, atencion:25, trabajo:26, recomendacion:27, comentario:28,
-  fecha_encuesta:31,
+  fecha_encuesta:31, asegurado:38,
 };
 
 function procesar(filas){
@@ -523,6 +523,7 @@ function extraerDetalle(filas){
       cia: norm(get(IDX.cia)) || "Sin dato",
       orden_servicio: norm(get(IDX.orden_servicio)),
       nro_poliza: norm(get(IDX.nro_poliza)),
+      asegurado: norm(get(IDX.asegurado)),
       fecha_servicio: norm(get(IDX.fecha_servicio)),
       fecha_encuesta: norm(get(IDX.fecha_encuesta)),
       estado_encuesta: estadoEncuestaCanon(get(IDX.estado_encuesta)),
@@ -812,7 +813,14 @@ function generarXlsx(headers, filas, colTextoForzado){
 </cellXfs>
 </styleSheet>`;
 
-  const anchosCol = headers.map((h,i)=> i===colTextoForzado ? 16 : Math.max(12, Math.min(32, h.length+2)));
+  const anchosCol = headers.map((h,i)=>{
+    let maxLen = String(h).length;
+    filas.forEach(fila=>{
+      const len = String(fila[i] ?? '').length;
+      if(len > maxLen) maxLen = len;
+    });
+    return Math.max(12, Math.min(40, maxLen+2));
+  });
   const colsXml = '<cols>' + anchosCol.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('') + '</cols>';
 
   const filasXml = [];
@@ -884,9 +892,9 @@ function generarInformesCliente(cia){
 
   // --- Archivo de detalle (.xlsx real, uso interno, incluye todos los casos) ---
   const filasDetalle = DETALLE_GLOBAL.filter(d=>d.cia===cia);
-  const headers = ['Orden de Servicio','N° de Póliza','Fecha de Servicio','Fecha de Encuesta','Estado de Encuesta','Atención','Trabajo','Recomendación'];
+  const headers = ['Orden de Servicio','N° de Póliza','Asegurado','Fecha de Servicio','Fecha de Encuesta','Estado de Encuesta','Atención','Trabajo','Recomendación'];
   const filasXlsx = filasDetalle.map(d=>[
-    d.orden_servicio, d.nro_poliza, d.fecha_servicio, d.fecha_encuesta, d.estado_encuesta,
+    d.orden_servicio, d.nro_poliza, d.asegurado, d.fecha_servicio, d.fecha_encuesta, d.estado_encuesta,
     d.atencion ?? '', d.trabajo ?? '', capitalizar(d.recomendacion),
   ]);
   const xlsxBlob = generarXlsx(headers, filasXlsx, 1); // columna 1 = N de Poliza, forzada a texto
