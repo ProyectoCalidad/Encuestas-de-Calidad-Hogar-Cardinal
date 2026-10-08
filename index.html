@@ -787,7 +787,7 @@ function renderTodo(){
 
   distribucionCombinada('chDistribucion', m.atencion.pct, m.trabajo.pct);
 
-  horizontalRanking('chRankingServicio', computarRanking(data, 'servicio'));
+  horizontalRanking('chRankingServicio', computarRanking(data, 'servicio', {excluirVacios:true}));
   horizontalRanking('chRankingProvincia', computarRanking(data, 'provincia', {excluirVacios:true}));
   if(!VISTA_CLIENTE){
     horizontalRanking('chRankingPrestador', computarRanking(data, 'prestador', {excluirVacios:true}));

@@ -98,7 +98,7 @@ footer{margin-top:30px;text-align:center;font-size:11.5px;color:var(--text-dim);
     <div class="status" id="status"></div>
 
     <div class="warn-box" id="warnBox">
-      <b>Atención</b> — algunas filas tuvieron datos que no pude interpretar del todo:
+      <b>Atención</b> — revisá estos puntos antes de usar los archivos:
       <ul id="warnList"></ul>
       El resto del archivo se procesó igual. Si algún número te parece raro en el panel, revisá esas filas en el Excel.
     </div>
@@ -447,19 +447,19 @@ const INDEX_TEMPLATE_B64 =
   "T1JTLnRlYWwsIENPTE9SUy5waW5rLCAnRXhjZWxlbnRlL011eSBidWVubycsICdSZWd1bGFyL01hbG8nLCBmbXRQY3QpOwogIGJhcnNEdWFsKCdjaFRyYWJham9Fdm9sJywgbS5ldm9sdWNpb24ubWFwKGU9PmUubWVzKSwgbS5ldm9sdWNpb24ubWFwKGU9PmUucG9zVHIpLCBtLmV2b2x1Y2lvbi5tYXAoZT0+ZS5uZWdUciksIENPTE9SUy5vcmFuZ2UsIENPTE9SUy5waW5rLCAnRXhjZWxlbnRlL011eSBidWVubycsICdSZWd1bGFyL01hbG8nLCBmbXRQY3QpOwogIGJhcnNEdWFsKCdjaE5wc0V2b2wnLCBtLmV2b2x1Y2lvbi5tYXAo" +
   "ZT0+ZS5tZXMpLCBtLmV2b2x1Y2lvbi5tYXAoZT0+ZS5wUHJvbSksIG0uZXZvbHVjaW9uLm1hcChlPT5lLnBEZXQpLCBDT0xPUlMudGVhbCwgQ09MT1JTLnBpbmssICclIFByb21vdG9yJywgJyUgRGV0cmFjdG9yJywgZm10UGN0KTsKCiAgZG9udXRDaGFydCgnY2hOcHNEb251dCcsIFsKICAgIHtsYWJlbDonUHJvbW90b3JlcycsIHZhbHVlOm0ucGN0UHJvbSwgY29sb3I6Q09MT1JTLnRlYWx9LAogICAge2xhYmVsOidQYXNpdm9zJywgdmFsdWU6bS5wY3RQYXMsIGNvbG9yOkNPTE9SUy5vcmFuZ2V9LAogICAge2xhYmVsOidEZXRy" +
   "YWN0b3JlcycsIHZhbHVlOm0ucGN0RGV0LCBjb2xvcjpDT0xPUlMucGlua30sCiAgXSk7CgogIGNvbnN0IGNvbnRhY3RvRW50cmllcyA9IE9iamVjdC5lbnRyaWVzKG0ubml2ZWxDb250YWN0bykuc29ydCgoYSxiKT0+YlsxXS1hWzFdKTsKICBiYXJzU2luZ2xlKCdjaENvbnRhY3RvJywgY29udGFjdG9FbnRyaWVzLm1hcChlPT5lWzBdKSwgY29udGFjdG9FbnRyaWVzLm1hcChlPT5lWzFdKSwgKCk9PkNPTE9SUy50ZWFsLCB2PT52KTsKCiAgY29uc3QgcmVzcHVlc3RhRW50cmllcyA9IE9iamVjdC5lbnRyaWVzKG0ubml2ZWxSZXNw" +
-  "dWVzdGEpLnNvcnQoKGEsYik9PmJbMV0tYVsxXSk7CiAgYmFyc1NpbmdsZSgnY2hSZXNwdWVzdGEnLCByZXNwdWVzdGFFbnRyaWVzLm1hcChlPT5lWzBdKSwgcmVzcHVlc3RhRW50cmllcy5tYXAoZT0+ZVsxXSksICgpPT5DT0xPUlMub3JhbmdlLCB2PT52KTsKCiAgZGlzdHJpYnVjaW9uQ29tYmluYWRhKCdjaERpc3RyaWJ1Y2lvbicsIG0uYXRlbmNpb24ucGN0LCBtLnRyYWJham8ucGN0KTsKCiAgaG9yaXpvbnRhbFJhbmtpbmcoJ2NoUmFua2luZ1NlcnZpY2lvJywgY29tcHV0YXJSYW5raW5nKGRhdGEsICdzZXJ2aWNpbycpKTsK" +
-  "ICBob3Jpem9udGFsUmFua2luZygnY2hSYW5raW5nUHJvdmluY2lhJywgY29tcHV0YXJSYW5raW5nKGRhdGEsICdwcm92aW5jaWEnLCB7ZXhjbHVpclZhY2lvczp0cnVlfSkpOwogIGlmKCFWSVNUQV9DTElFTlRFKXsKICAgIGhvcml6b250YWxSYW5raW5nKCdjaFJhbmtpbmdQcmVzdGFkb3InLCBjb21wdXRhclJhbmtpbmcoZGF0YSwgJ3ByZXN0YWRvcicsIHtleGNsdWlyVmFjaW9zOnRydWV9KSk7CiAgICByZW5kZXJDb21lbnRhcmlvcyhtLmNvbWVudGFyaW9zKTsKICB9Cn0KCi8vIC0tLS0tLS0tLS0gSW5pdCAtLS0tLS0tLS0t" +
-  "CmZ1bmN0aW9uIGluaXRGaWx0cm9zKCl7CiAgWydmTWVzJywnZkFyZWEnLCdmQ2lhJywnZlByb3ZpbmNpYSddLmZvckVhY2goaWQ9PnsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKGlkKS5hZGRFdmVudExpc3RlbmVyKCdjaGFuZ2UnLCByZW5kZXJUb2RvKTsKICB9KTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2xlYXJGaWx0cm9zJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCAoKT0+ewogICAgWydmTWVzJywnZkFyZWEnLCdmQ2lhJywnZlByb3ZpbmNpYSddLmZvckVhY2goaWQ9PmRvY3VtZW50LmdldEVsZW1l" +
-  "bnRCeUlkKGlkKS52YWx1ZT0nJyk7CiAgICByZW5kZXJUb2RvKCk7CiAgfSk7CiAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ3Jlc2l6ZScsIGRlYm91bmNlKHJlbmRlclRvZG8sIDIwMCkpOwp9CmZ1bmN0aW9uIGRlYm91bmNlKGZuLCBtcyl7IGxldCB0OyByZXR1cm4gKC4uLmEpPT57IGNsZWFyVGltZW91dCh0KTsgdD1zZXRUaW1lb3V0KCgpPT5mbiguLi5hKSxtcyk7IH07IH0KCmZ1bmN0aW9uIGluaXRUaGVtZSgpewogIGNvbnN0IGJ0biA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0aGVtZUJ0bicpOwogIGNvbnN0IHNh" +
-  "dmVkID0gbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ3BhbmVsLWhvZ2FyLXRoZW1lJykgfHwgJ2RhcmsnOwogIGRvY3VtZW50LmJvZHkuc2V0QXR0cmlidXRlKCdkYXRhLXRoZW1lJywgc2F2ZWQpOwogIGJ0bi50ZXh0Q29udGVudCA9IHNhdmVkPT09J2RhcmsnID8gJ/CfjJknIDogJ+KYgO+4jyc7CiAgYnRuLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgKCk9PnsKICAgIGNvbnN0IGN1ciA9IGRvY3VtZW50LmJvZHkuZ2V0QXR0cmlidXRlKCdkYXRhLXRoZW1lJyk7CiAgICBjb25zdCBuZXh0ID0gY3VyPT09J2RhcmsnID8gJ2xpZ2h0" +
-  "JyA6ICdkYXJrJzsKICAgIGRvY3VtZW50LmJvZHkuc2V0QXR0cmlidXRlKCdkYXRhLXRoZW1lJywgbmV4dCk7CiAgICBsb2NhbFN0b3JhZ2Uuc2V0SXRlbSgncGFuZWwtaG9nYXItdGhlbWUnLCBuZXh0KTsKICAgIGJ0bi50ZXh0Q29udGVudCA9IG5leHQ9PT0nZGFyaycgPyAn8J+MmScgOiAn4piA77iPJzsKICAgIHJlbmRlclRvZG8oKTsKICB9KTsKfQoKZnVuY3Rpb24gaW5pdFRhYnMoKXsKICBjb25zdCBidG5zID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnLnRhYi1idG4nKTsKICBidG5zLmZvckVhY2goYnRuPT57CiAg" +
-  "ICBidG4uYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCAoKT0+ewogICAgICBidG5zLmZvckVhY2goYj0+Yi5jbGFzc0xpc3QucmVtb3ZlKCdhY3RpdmUnKSk7CiAgICAgIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJy50YWItcGFuZWwnKS5mb3JFYWNoKHA9PnAuY2xhc3NMaXN0LnJlbW92ZSgnYWN0aXZlJykpOwogICAgICBidG4uY2xhc3NMaXN0LmFkZCgnYWN0aXZlJyk7CiAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKGJ0bi5kYXRhc2V0LnRhYikuY2xhc3NMaXN0LmFkZCgnYWN0aXZlJyk7CiAgICAgIC8vIGxvcyBn" +
-  "cmFmaWNvcyBTVkcgbmVjZXNpdGFuIHJlY2FsY3VsYXIgc3UgYW5jaG8gYWwgaGFjZXJzZSB2aXNpYmxlcwogICAgICBpZihidG4uZGF0YXNldC50YWIgPT09ICd0YWJLcGlzJykgcmVuZGVyVG9kbygpOwogICAgfSk7CiAgfSk7Cn0KCmxldCBWSVNUQV9DTElFTlRFID0gZmFsc2U7CgpmdW5jdGlvbiBhcGxpY2FyVmlzdGFDbGllbnRlKCl7CiAgLy8gT2N1bHRhIGxvIHF1ZSBubyBjb3JyZXNwb25kZSBjb21wYXJ0aXIgZW4gdW4gaW5mb3JtZSBpbmRpdmlkdWFsIHBvciBjbGllbnRlOgogIC8vIHBlc3Rhw7FhIGRlIENvbWVudGFy" +
-  "aW9zLCByYW5raW5nIHBvciBQcmVzdGFkb3IsIHkgZWwgZmlsdHJvIGRlIEPDrWEgKHlhIHZpZW5lIGFjb3RhZG8gYSB1bmEgc29sYSkuCiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2J0blRhYkNvbWVudGFyaW9zJykuc3R5bGUuZGlzcGxheSA9ICdub25lJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2FyZFJhbmtpbmdQcmVzdGFkb3InKS5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnOwogIGNvbnN0IGZDaWEgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZkNpYScpOwogIGZDaWEuc3R5bGUuZGlzcGxheSA9ICdub25l" +
-  "JzsKICBmQ2lhLnZhbHVlID0gJyc7Cn0KCmZ1bmN0aW9uIGluaWNpYXJQYW5lbChqc29uKXsKICBSQVcgPSBqc29uLnJlZ2lzdHJvczsKICBWSVNUQV9DTElFTlRFID0gISFqc29uLnZpc3RhQ2xpZW50ZTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZ2VuZXJhZG9QaWxsJykudGV4dENvbnRlbnQgPSAnRGF0b3MgYWN0dWFsaXphZG9zOiAnICsgKGpzb24uZ2VuZXJhZG8gfHwgJ+KAlCcpOwogIHBvYmxhckZpbHRyb3MoUkFXKTsKICBpbml0RmlsdHJvcygpOwogIGluaXRUaGVtZSgpOwogIGluaXRUYWJzKCk7CiAgaWYoVklT" +
-  "VEFfQ0xJRU5URSkgYXBsaWNhclZpc3RhQ2xpZW50ZSgpOwogIHJlbmRlclRvZG8oKTsKfQoKaWYod2luZG93LlBBTkVMX0RBVEEpewogIC8vIFZlcnNpb24gc3RhbmRhbG9uZTogbG9zIGRhdG9zIHlhIHZpZW5lbiBpbmNydXN0YWRvcyBlbiBlc3RlIG1pc21vIGFyY2hpdm8gSFRNTC4KICBpbmljaWFyUGFuZWwod2luZG93LlBBTkVMX0RBVEEpOwp9IGVsc2UgewogIC8vIFZlcnNpb24gbm9ybWFsOiBsb3MgZGF0b3Mgc2UgbGVlbiBkZSBkYXRhLmpzb24gZW4gbGEgbWlzbWEgY2FycGV0YS4KICBmZXRjaCgnZGF0YS5qc29uP3Y9" +
-  "JyArIERhdGUubm93KCkpCiAgICAudGhlbihyPT5yLmpzb24oKSkKICAgIC50aGVuKGluaWNpYXJQYW5lbCkKICAgIC5jYXRjaChlcnI9PnsKICAgICAgZG9jdW1lbnQucXVlcnlTZWxlY3RvcignLndyYXAnKS5pbm5lckhUTUwgPSAnPHAgc3R5bGU9ImNvbG9yOiNlNjFjNWM7cGFkZGluZzo0MHB4OyI+Tm8gc2UgcHVkbyBjYXJnYXIgZGF0YS5qc29uLiBWZXJpZmljw6EgcXVlIGVsIGFyY2hpdm8gZXN0w6kgZW4gbGEgbWlzbWEgY2FycGV0YSBxdWUgaW5kZXguaHRtbC48L3A+JzsKICAgICAgY29uc29sZS5lcnJvcihlcnIpOwog" +
-  "ICAgfSk7Cn0KPC9zY3JpcHQ+CjwvYm9keT4KPC9odG1sPgo=";
+  "dWVzdGEpLnNvcnQoKGEsYik9PmJbMV0tYVsxXSk7CiAgYmFyc1NpbmdsZSgnY2hSZXNwdWVzdGEnLCByZXNwdWVzdGFFbnRyaWVzLm1hcChlPT5lWzBdKSwgcmVzcHVlc3RhRW50cmllcy5tYXAoZT0+ZVsxXSksICgpPT5DT0xPUlMub3JhbmdlLCB2PT52KTsKCiAgZGlzdHJpYnVjaW9uQ29tYmluYWRhKCdjaERpc3RyaWJ1Y2lvbicsIG0uYXRlbmNpb24ucGN0LCBtLnRyYWJham8ucGN0KTsKCiAgaG9yaXpvbnRhbFJhbmtpbmcoJ2NoUmFua2luZ1NlcnZpY2lvJywgY29tcHV0YXJSYW5raW5nKGRhdGEsICdzZXJ2aWNpbycsIHtl" +
+  "eGNsdWlyVmFjaW9zOnRydWV9KSk7CiAgaG9yaXpvbnRhbFJhbmtpbmcoJ2NoUmFua2luZ1Byb3ZpbmNpYScsIGNvbXB1dGFyUmFua2luZyhkYXRhLCAncHJvdmluY2lhJywge2V4Y2x1aXJWYWNpb3M6dHJ1ZX0pKTsKICBpZighVklTVEFfQ0xJRU5URSl7CiAgICBob3Jpem9udGFsUmFua2luZygnY2hSYW5raW5nUHJlc3RhZG9yJywgY29tcHV0YXJSYW5raW5nKGRhdGEsICdwcmVzdGFkb3InLCB7ZXhjbHVpclZhY2lvczp0cnVlfSkpOwogICAgcmVuZGVyQ29tZW50YXJpb3MobS5jb21lbnRhcmlvcyk7CiAgfQp9CgovLyAtLS0t" +
+  "LS0tLS0tIEluaXQgLS0tLS0tLS0tLQpmdW5jdGlvbiBpbml0RmlsdHJvcygpewogIFsnZk1lcycsJ2ZBcmVhJywnZkNpYScsJ2ZQcm92aW5jaWEnXS5mb3JFYWNoKGlkPT57CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCkuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJywgcmVuZGVyVG9kbyk7CiAgfSk7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NsZWFyRmlsdHJvcycpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgKCk9PnsKICAgIFsnZk1lcycsJ2ZBcmVhJywnZkNpYScsJ2ZQcm92aW5jaWEnXS5mb3JFYWNo" +
+  "KGlkPT5kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCkudmFsdWU9JycpOwogICAgcmVuZGVyVG9kbygpOwogIH0pOwogIHdpbmRvdy5hZGRFdmVudExpc3RlbmVyKCdyZXNpemUnLCBkZWJvdW5jZShyZW5kZXJUb2RvLCAyMDApKTsKfQpmdW5jdGlvbiBkZWJvdW5jZShmbiwgbXMpeyBsZXQgdDsgcmV0dXJuICguLi5hKT0+eyBjbGVhclRpbWVvdXQodCk7IHQ9c2V0VGltZW91dCgoKT0+Zm4oLi4uYSksbXMpOyB9OyB9CgpmdW5jdGlvbiBpbml0VGhlbWUoKXsKICBjb25zdCBidG4gPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgn" +
+  "dGhlbWVCdG4nKTsKICBjb25zdCBzYXZlZCA9IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdwYW5lbC1ob2dhci10aGVtZScpIHx8ICdkYXJrJzsKICBkb2N1bWVudC5ib2R5LnNldEF0dHJpYnV0ZSgnZGF0YS10aGVtZScsIHNhdmVkKTsKICBidG4udGV4dENvbnRlbnQgPSBzYXZlZD09PSdkYXJrJyA/ICfwn4yZJyA6ICfimIDvuI8nOwogIGJ0bi5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsICgpPT57CiAgICBjb25zdCBjdXIgPSBkb2N1bWVudC5ib2R5LmdldEF0dHJpYnV0ZSgnZGF0YS10aGVtZScpOwogICAgY29uc3QgbmV4dCA9" +
+  "IGN1cj09PSdkYXJrJyA/ICdsaWdodCcgOiAnZGFyayc7CiAgICBkb2N1bWVudC5ib2R5LnNldEF0dHJpYnV0ZSgnZGF0YS10aGVtZScsIG5leHQpOwogICAgbG9jYWxTdG9yYWdlLnNldEl0ZW0oJ3BhbmVsLWhvZ2FyLXRoZW1lJywgbmV4dCk7CiAgICBidG4udGV4dENvbnRlbnQgPSBuZXh0PT09J2RhcmsnID8gJ/CfjJknIDogJ+KYgO+4jyc7CiAgICByZW5kZXJUb2RvKCk7CiAgfSk7Cn0KCmZ1bmN0aW9uIGluaXRUYWJzKCl7CiAgY29uc3QgYnRucyA9IGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJy50YWItYnRuJyk7CiAg" +
+  "YnRucy5mb3JFYWNoKGJ0bj0+ewogICAgYnRuLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgKCk9PnsKICAgICAgYnRucy5mb3JFYWNoKGI9PmIuY2xhc3NMaXN0LnJlbW92ZSgnYWN0aXZlJykpOwogICAgICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcudGFiLXBhbmVsJykuZm9yRWFjaChwPT5wLmNsYXNzTGlzdC5yZW1vdmUoJ2FjdGl2ZScpKTsKICAgICAgYnRuLmNsYXNzTGlzdC5hZGQoJ2FjdGl2ZScpOwogICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZChidG4uZGF0YXNldC50YWIpLmNsYXNzTGlzdC5hZGQoJ2Fj" +
+  "dGl2ZScpOwogICAgICAvLyBsb3MgZ3JhZmljb3MgU1ZHIG5lY2VzaXRhbiByZWNhbGN1bGFyIHN1IGFuY2hvIGFsIGhhY2Vyc2UgdmlzaWJsZXMKICAgICAgaWYoYnRuLmRhdGFzZXQudGFiID09PSAndGFiS3BpcycpIHJlbmRlclRvZG8oKTsKICAgIH0pOwogIH0pOwp9CgpsZXQgVklTVEFfQ0xJRU5URSA9IGZhbHNlOwoKZnVuY3Rpb24gYXBsaWNhclZpc3RhQ2xpZW50ZSgpewogIC8vIE9jdWx0YSBsbyBxdWUgbm8gY29ycmVzcG9uZGUgY29tcGFydGlyIGVuIHVuIGluZm9ybWUgaW5kaXZpZHVhbCBwb3IgY2xpZW50ZToKICAv" +
+  "LyBwZXN0YcOxYSBkZSBDb21lbnRhcmlvcywgcmFua2luZyBwb3IgUHJlc3RhZG9yLCB5IGVsIGZpbHRybyBkZSBDw61hICh5YSB2aWVuZSBhY290YWRvIGEgdW5hIHNvbGEpLgogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdidG5UYWJDb21lbnRhcmlvcycpLnN0eWxlLmRpc3BsYXkgPSAnbm9uZSc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NhcmRSYW5raW5nUHJlc3RhZG9yJykuc3R5bGUuZGlzcGxheSA9ICdub25lJzsKICBjb25zdCBmQ2lhID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2ZDaWEnKTsKICBmQ2lh" +
+  "LnN0eWxlLmRpc3BsYXkgPSAnbm9uZSc7CiAgZkNpYS52YWx1ZSA9ICcnOwp9CgpmdW5jdGlvbiBpbmljaWFyUGFuZWwoanNvbil7CiAgUkFXID0ganNvbi5yZWdpc3Ryb3M7CiAgVklTVEFfQ0xJRU5URSA9ICEhanNvbi52aXN0YUNsaWVudGU7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2dlbmVyYWRvUGlsbCcpLnRleHRDb250ZW50ID0gJ0RhdG9zIGFjdHVhbGl6YWRvczogJyArIChqc29uLmdlbmVyYWRvIHx8ICfigJQnKTsKICBwb2JsYXJGaWx0cm9zKFJBVyk7CiAgaW5pdEZpbHRyb3MoKTsKICBpbml0VGhlbWUoKTsK" +
+  "ICBpbml0VGFicygpOwogIGlmKFZJU1RBX0NMSUVOVEUpIGFwbGljYXJWaXN0YUNsaWVudGUoKTsKICByZW5kZXJUb2RvKCk7Cn0KCmlmKHdpbmRvdy5QQU5FTF9EQVRBKXsKICAvLyBWZXJzaW9uIHN0YW5kYWxvbmU6IGxvcyBkYXRvcyB5YSB2aWVuZW4gaW5jcnVzdGFkb3MgZW4gZXN0ZSBtaXNtbyBhcmNoaXZvIEhUTUwuCiAgaW5pY2lhclBhbmVsKHdpbmRvdy5QQU5FTF9EQVRBKTsKfSBlbHNlIHsKICAvLyBWZXJzaW9uIG5vcm1hbDogbG9zIGRhdG9zIHNlIGxlZW4gZGUgZGF0YS5qc29uIGVuIGxhIG1pc21hIGNhcnBldGEu" +
+  "CiAgZmV0Y2goJ2RhdGEuanNvbj92PScgKyBEYXRlLm5vdygpKQogICAgLnRoZW4ocj0+ci5qc29uKCkpCiAgICAudGhlbihpbmljaWFyUGFuZWwpCiAgICAuY2F0Y2goZXJyPT57CiAgICAgIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJy53cmFwJykuaW5uZXJIVE1MID0gJzxwIHN0eWxlPSJjb2xvcjojZTYxYzVjO3BhZGRpbmc6NDBweDsiPk5vIHNlIHB1ZG8gY2FyZ2FyIGRhdGEuanNvbi4gVmVyaWZpY8OhIHF1ZSBlbCBhcmNoaXZvIGVzdMOpIGVuIGxhIG1pc21hIGNhcnBldGEgcXVlIGluZGV4Lmh0bWwuPC9wPic7CiAgICAg" +
+  "IGNvbnNvbGUuZXJyb3IoZXJyKTsKICAgIH0pOwp9Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4K";
 
 // ---------- Procesamiento principal ----------
 const IDX = {
@@ -468,6 +468,63 @@ const IDX = {
   estado_encuesta:24, atencion:25, trabajo:26, recomendacion:27, comentario:28,
   fecha_encuesta:31, asegurado:38,
 };
+
+// Normaliza un encabezado para compararlo (sin tildes, mayusculas ni espacios de mas).
+function normHeader(h){
+  return String(h||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+}
+
+// Columnas que se ubican por NOMBRE (asi no importa si el Excel mueve o borra columnas
+// auxiliares). Si no la encuentra, usa la posicion fija de siempre.
+const COLUMNAS_POR_NOMBRE = {
+  asegurado: 'asegurado',
+  fecha_encuesta: 'fecha y hora del llamado',
+  nro_poliza: 'nropoliza',
+  orden_servicio: 'idordenservicio',
+  fecha_servicio: 'fecha de servicio',
+};
+// Columnas que se leen por posicion fija: se controla que el nombre coincida.
+const COLUMNAS_FIJAS_ESPERADAS = {
+  mes:'mes', area:'area', cia:'cia', provincia:'provincia', servicio:'servicio',
+  prestador:'prestador', gestion_tel:'gestion telefonica', estado_encuesta:'estado encuesta',
+};
+
+function resolverColumnas(headerRow){
+  const avisos = [];
+  const hdr = headerRow.map(normHeader);
+
+  // 1) Ubicar por nombre
+  Object.entries(COLUMNAS_POR_NOMBRE).forEach(([campo, nombre])=>{
+    const pos = hdr.indexOf(nombre);
+    if(pos !== -1){
+      if(pos !== IDX[campo]) IDX[campo] = pos; // se movio: usamos la posicion real
+    } else {
+      avisos.push(`Columna: no encontré "${nombre}" en el archivo. Ese dato va a salir vacío en los informes.`);
+    }
+  });
+
+  // 2) Controlar las de posicion fija
+  Object.entries(COLUMNAS_FIJAS_ESPERADAS).forEach(([campo, nombre])=>{
+    const real = hdr[IDX[campo]];
+    if(real !== nombre){
+      avisos.push(`Columna: en la posición esperada para "${nombre}" hay "${headerRow[IDX[campo]] ?? '(vacía)'}". Revisá que no se haya movido ninguna columna.`);
+    }
+  });
+
+  // 3) Las 4 columnas de preguntas (Z a AC) por palabras clave
+  const preguntas = [
+    [IDX.atencion, 'atencion', 'Atención telefónica (Z)'],
+    [IDX.trabajo, 'calidad del trabajo', 'Calidad del trabajo (AA)'],
+    [IDX.recomendacion, 'recomiende', 'Recomendación (AB)'],
+  ];
+  preguntas.forEach(([pos, clave, etiqueta])=>{
+    if(!(hdr[pos]||'').includes(clave)){
+      avisos.push(`Columna: la pregunta "${etiqueta}" no está donde se esperaba. Revisá que no se haya movido ninguna columna.`);
+    }
+  });
+
+  return avisos;
+}
 
 function procesar(filas){
   const warnings = [];
@@ -608,7 +665,9 @@ function manejarArchivo(file){
       if(filas.length < 2){
         throw new Error('El archivo está vacío o no tiene filas de datos.');
       }
-      const {registros, warnings} = procesar(filas);
+      const avisosColumnas = resolverColumnas(filas[0]);
+      const {registros, warnings: warningsFilas} = procesar(filas);
+      const warnings = avisosColumnas.concat(warningsFilas);
       if(registros.length === 0){
         throw new Error('No encontré ningún caso para procesar. Verificá que hayas exportado la hoja "Histórico".');
       }
